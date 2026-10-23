@@ -10,7 +10,7 @@ dotnet publish NrgToMp3.csproj -c Release -r osx-arm64 --self-contained true -p:
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 clang -O2 -c mac/cdread.c -o "$WORK/cdread.o"
-swiftc -O -parse-as-library -import-objc-header mac/cdread.h "$WORK/cdread.o" -target arm64-apple-macos13 mac/NrgToMp3App.swift mac/BurnList.swift mac/Lookup.swift mac/CDCopy.swift mac/SplitEditor.swift mac/SplitTab.swift mac/KeyChanger.swift mac/PlayerTab.swift -framework DiscRecording -framework DiscRecordingUI -o "$APP/Contents/MacOS/NRG to MP3"
+swiftc -O -parse-as-library -import-objc-header mac/cdread.h "$WORK/cdread.o" -target arm64-apple-macos13 mac/NrgToMp3App.swift mac/BurnList.swift mac/Lookup.swift mac/CDCopy.swift mac/SplitEditor.swift mac/SplitTab.swift mac/KeyChanger.swift mac/PlayerTab.swift mac/NamesSync.swift -framework DiscRecording -framework DiscRecordingUI -o "$APP/Contents/MacOS/NRG to MP3"
 cp dist/cli/NrgToMp3 "$APP/Contents/Resources/"
 # MP3 encoder with LAME built in, so MP3 export works on Macs without Homebrew/ffmpeg
 clang -O2 -I/opt/homebrew/opt/lame/include mac/mp3enc.c /opt/homebrew/opt/lame/lib/libmp3lame.a /opt/homebrew/opt/mpg123/lib/libmpg123.a -o "$APP/Contents/Resources/mp3enc"

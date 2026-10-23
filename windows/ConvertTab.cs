@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -34,6 +35,7 @@ namespace NrgToMp3Win
         readonly Label mergeExt = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(0, 7, 3, 3) };
         readonly Button lookup = new() { Text = "Look Up Names…", AutoSize = true };
         readonly Button saveNames = new() { Text = "Save Names", AutoSize = true }, loadNames = new() { Text = "Load Names…", AutoSize = true };
+        readonly Button pullNames = new() { Text = "Get from GitHub", AutoSize = true }, syncSetup = new() { Text = "GitHub…", AutoSize = true };
         readonly Label namesNote = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 7, 3, 3) };
         readonly Button all = new() { Text = "Check All", AutoSize = true }, none = new() { Text = "Uncheck All", AutoSize = true };
         readonly Button noneAnywhere = new() { Text = "Uncheck All Discs", AutoSize = true };
@@ -117,12 +119,18 @@ namespace NrgToMp3Win
             var discHeader = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = true };
             discHeader.Controls.Add(discTitle); discHeader.SetFlowBreak(discTitle, true);
             discHeader.Controls.Add(discInfo); discHeader.SetFlowBreak(discInfo, true);
-            discHeader.Controls.AddRange(new Control[] { Gray("Album"), album, Gray("Artist"), artist, lookup, saveNames, loadNames, playAll, all, none });
+            discHeader.Controls.AddRange(new Control[] { Gray("Album"), album, Gray("Artist"), artist, lookup, saveNames, loadNames, pullNames, syncSetup, playAll, all, none });
             discHeader.SetFlowBreak(none, true);
             discHeader.Controls.Add(namesNote);
             discHeader.SetFlowBreak(namesNote, true);
             saveNames.Click += (_, _) => SaveNames();
             loadNames.Click += (_, _) => LoadNames();
+            pullNames.Click += (_, _) => { if (Current != null) PullNames(Current, false); };
+            syncSetup.Click += (_, _) =>
+            {
+                using var f = new NamesSyncForm();
+                if (f.ShowDialog(this) == DialogResult.OK) ShowDisc();
+            };
             discHeader.Controls.AddRange(new Control[] { mergeLabel, mergeName, mergeExt });
             playAll.Click += (_, _) => PlayAll(0);
             new ToolTip().SetToolTip(playAll, "Play every song in order, to check the tracks");
@@ -191,6 +199,8 @@ namespace NrgToMp3Win
             tips.SetToolTip(none, "Untick every song on this disc, then tick just the ones you want");
             tips.SetToolTip(noneAnywhere, "Untick every song on every disc in the list");
             tips.SetToolTip(saveNames, "Save the album, artist and song names to a .txt file next to the image; they load automatically next time");
+            tips.SetToolTip(pullNames, "Load the names for this disc from the \"names\" folder on GitHub (e.g. after editing them on github.com)");
+            tips.SetToolTip(syncSetup, "Turn GitHub name syncing on or off, and add the access key that lets Save Names upload");
             tips.SetToolTip(loadNames, "Read song names from a text file: one song per line, e.g. \"1. Amazing Grace\"");
             tips.SetToolTip(mergeName, "Name of the single file this disc's ticked songs are merged into. Leave empty to use the first ticked song's name. You can change it again when you export.");
             var bottom = new Panel { Dock = DockStyle.Bottom, Height = 170 };
@@ -236,7 +246,7 @@ namespace NrgToMp3Win
             {
                 var d = new DiscItem { Path = f };
                 discs.Add(d);
-                Task.Run(d.Load).ContinueWith(_ => BeginInvoke(RefreshList));
+                Task.Run(d.Load).ContinueWith(_ => BeginInvoke(() => { RefreshList(); if (SyncSettings.On) PullNames(d, true); }));
             }
             RefreshList();
             if (Current == null && discs.Count > 0) discList.SelectedIndex = discs.Count - 1;
@@ -261,6 +271,7 @@ namespace NrgToMp3Win
             bool ok = d != null && !d.Loading && d.Error == null;
             album.Enabled = artist.Enabled = lookup.Enabled = all.Enabled = none.Enabled = mergeName.Enabled = ok && !running;
             saveNames.Enabled = loadNames.Enabled = ok && !running;
+            pullNames.Enabled = ok && !running && SyncSettings.On;
             namesNote.Text = ok ? d.NamesNote ?? "" : "";
             namesNote.Visible = namesNote.Text != "";
             mergeLabel.Visible = mergeName.Visible = mergeExt.Visible = merge.Checked && ok;
@@ -357,6 +368,7 @@ namespace NrgToMp3Win
             {
                 File.WriteAllText(d.NamesFile, text, new UTF8Encoding(true));
                 d.NamesNote = $"Names saved to {System.IO.Path.GetFileName(d.NamesFile)}; they'll load automatically next time";
+                PushNames(d, text);
             }
             catch
             {
@@ -364,10 +376,68 @@ namespace NrgToMp3Win
                 using var f = new SaveFileDialog { FileName = System.IO.Path.GetFileName(d.NamesFile), Filter = "Text files (*.txt)|*.txt",
                                                    Title = "Couldn't save next to the image. Choose where to save the names file." };
                 if (f.ShowDialog(this) != DialogResult.OK) return;
-                try { File.WriteAllText(f.FileName, text, new UTF8Encoding(true)); d.NamesNote = $"Names saved to {System.IO.Path.GetFileName(f.FileName)}"; }
+                try { File.WriteAllText(f.FileName, text, new UTF8Encoding(true)); d.NamesNote = $"Names saved to {System.IO.Path.GetFileName(f.FileName)}"; PushNames(d, text); }
                 catch (Exception ex) { d.NamesNote = "Couldn't save the names: " + ex.Message; }
             }
             ShowDisc();
+        }
+
+        /// <summary>Loads this disc's names from GitHub if they differ from the names file on this computer
+        /// (which is then updated too). Automatic = just opened: stay quiet unless something changed.</summary>
+        async void PullNames(DiscItem d, bool automatic)
+        {
+            if (d.Loading || d.Error != null) return;
+            var remotePath = NamesSync.RemotePath(d.Path);
+            try
+            {
+                var remote = await NamesSync.Download(SyncSettings.Repo, SyncSettings.Token, d.Path);
+                string local = null;
+                try { if (File.Exists(d.NamesFile)) local = File.ReadAllText(d.NamesFile); } catch { }
+                if (remote == null)
+                {
+                    if (!automatic) d.NamesNote = $"There's no {remotePath} on GitHub yet. Save Names will put it there.";
+                }
+                else if (local != null && NamesSync.Same(remote.Text, local))
+                {
+                    if (!automatic) d.NamesNote = "The names on this computer already match GitHub";
+                }
+                else
+                {
+                    d.NamesNote = $"{d.ApplyNames(remote.Text)} name(s) loaded from GitHub ({remotePath})";
+                    try { File.WriteAllText(d.NamesFile, remote.Text.Replace("\r\n", "\n").Replace("\n", "\r\n"), new UTF8Encoding(true)); }
+                    catch { d.NamesNote += "; couldn't update the names file next to the image"; }
+                }
+            }
+            catch (Exception ex)
+            {
+                var why = ex is HttpRequestException or TaskCanceledException ? "couldn't reach GitHub (no internet?)" : ex.Message;
+                d.NamesNote = automatic ? (d.NamesNote != null ? d.NamesNote + " · " : "") + "GitHub: " + why : "Couldn't get names from GitHub: " + why;
+            }
+            if (d == Current && !grid.IsCurrentCellInEditMode) ShowDisc();
+        }
+
+        /// <summary>After Save Names: puts the same names on GitHub (if syncing is on).</summary>
+        async void PushNames(DiscItem d, string text)
+        {
+            if (!SyncSettings.On) return;
+            if (string.IsNullOrWhiteSpace(SyncSettings.Token))
+            {
+                d.NamesNote += ". To upload them to GitHub too, add an access key with GitHub…";
+                return;
+            }
+            var saved = d.NamesNote;
+            d.NamesNote = saved + " · uploading to GitHub…";
+            try
+            {
+                bool changed = await NamesSync.Upload(SyncSettings.Repo, SyncSettings.Token, d.Path, text);
+                d.NamesNote = saved + (changed ? $" and uploaded to GitHub ({NamesSync.RemotePath(d.Path)})" : " · GitHub already has these names");
+            }
+            catch (Exception ex)
+            {
+                var why = ex is HttpRequestException or TaskCanceledException ? "couldn't reach GitHub (no internet?)" : ex.Message;
+                d.NamesNote = saved + " · not uploaded: " + why;
+            }
+            if (d == Current && !grid.IsCurrentCellInEditMode) ShowDisc();
         }
 
         void LoadNames()
