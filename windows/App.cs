@@ -86,7 +86,7 @@ namespace NrgToMp3Win
 
     class MainForm : Form
     {
-        public const int Build = 18;   // shown in the title bar, to tell test versions apart
+        public const int Build = 19;   // shown in the title bar, to tell test versions apart
 
         public MainForm()
         {

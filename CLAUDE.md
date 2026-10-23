@@ -21,7 +21,7 @@ Don't assume the other machine's copy has your changes.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **18**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **19**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -93,7 +93,7 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 
 - **Names file:** `<image name>.txt` next to the image, loaded automatically when it's opened. Lines: `Album: …`, `Artist: …`, `1. Song name` (also `1)`, `01 -`, `1 `), or unnumbered lines in order; `#` comments. Accept UTF-8 (with or without BOM) and Latin-1.
 - **Playlist:** `.nrgplaylist` JSON: `{version, title, defaultGap, songs:[{title, gap?, note?, file? | image+track{number,title,performer,seconds,start,sectors,sectorSize,gap}+swap}]}`. Paths are absolute; when loading, also look for the same file name next to the playlist (and in its "<playlist> files" folder).
-- **Names on GitHub** (both apps, Windows build 18): names files are also kept at `names/<image name>.txt` in a GitHub repo (default `gwsparky/NRGtoMP3`, set with **GitHub…**). Opening a disc downloads that file and, if it differs from the local `.txt`, applies it and overwrites the local file (GitHub wins). **Save Names** writes the local file, then uploads (needs a fine-grained token with Contents read/write; Mac: Keychain, Windows: DPAPI in settings.json). **Get from GitHub** re-downloads. Code: `mac/NamesSync.swift`, `windows/NamesSync.cs`. Not yet tested on a real Mac/PC.
+- **Names on GitHub** (both apps, Windows build 18): names files are also kept at `names/<image name>.txt` in a GitHub repo (default `gwsparky/NRGtoMP3`, set with **GitHub…**). Opening a disc downloads that file and, if it differs from the local `.txt`, applies it and overwrites the local file (GitHub wins). **Save Names** writes the local file, then uploads (needs a fine-grained token with Contents read/write; Mac: Keychain, Windows: DPAPI in settings.json). **Get from GitHub** re-downloads. **Copy CD** (both apps, build 19) also writes `<name>.txt` next to the CUE/BIN and uploads it. Code: `mac/NamesSync.swift`, `windows/NamesSync.cs`. Not yet tested on a real Mac/PC.
 - **Merged-file names** default to the first ticked song's name; the user confirms or edits before anything is written.
 
 ## Working with George

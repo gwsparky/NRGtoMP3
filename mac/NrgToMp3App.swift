@@ -70,8 +70,8 @@ final class Disc: ObservableObject, Identifiable {
     var namesFile: URL { url.deletingPathExtension().appendingPathExtension("txt") }
 
     /// Album, artist and song names as a simple text file anyone can write by hand.
-    func namesText() -> String {
-        var lines = ["# Song names for \(url.lastPathComponent)",
+    func namesText(for image: URL? = nil) -> String {
+        var lines = ["# Song names for \((image ?? url).lastPathComponent)",
                      "# One song per line: a number, then the name. Lines starting with # are ignored."]
         if !album.isEmpty { lines.append("Album: \(album)") }
         if !artist.isEmpty { lines.append("Artist: \(artist)") }

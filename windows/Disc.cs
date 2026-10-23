@@ -26,11 +26,11 @@ namespace NrgToMp3Win
         public string NamesFile => System.IO.Path.ChangeExtension(Path, ".txt");
 
         /// <summary>Album, artist and song names as a simple text file anyone can write by hand.</summary>
-        public string NamesText()
+        public string NamesText(string imageName = null)
         {
             var lines = new List<string>
             {
-                $"# Song names for {System.IO.Path.GetFileName(Path)}",
+                $"# Song names for {imageName ?? System.IO.Path.GetFileName(Path)}",
                 "# One song per line: a number, then the name. Lines starting with # are ignored.",
             };
             if (Album != "") lines.Add($"Album: {Album}");

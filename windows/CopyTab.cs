@@ -246,7 +246,8 @@ namespace NrgToMp3Win
             if (safe == "") safe = "Audio CD";
             string name = safe;
             for (int k = 2; File.Exists(Path.Combine(folder, name + ".cue")) || File.Exists(Path.Combine(folder, name + ".bin")); k++) name = $"{safe} ({k})";
-            string cue = Path.Combine(folder, name + ".cue"), bin = Path.Combine(folder, name + ".bin");
+            string cue = Path.Combine(folder, name + ".cue"), bin = Path.Combine(folder, name + ".bin"), txt = Path.Combine(folder, name + ".txt");
+            var namesText = disc.NamesText(Path.GetFileName(cue));     // the names file, shared with the Mac (and GitHub)
             var list = songs;
             var titles = disc.Songs.Select(t => BurnList.NumberedName(t.Number, disc.Name(t))).ToList();
             string albumName = disc.Album.Trim(), artistName = disc.Artist.Trim(), letter = drive;
@@ -290,6 +291,7 @@ namespace NrgToMp3Win
                     }
                 }
                 File.WriteAllText(cue, text.ToString(), new UTF8Encoding(false));
+                try { File.WriteAllText(txt, namesText, new UTF8Encoding(true)); } catch { }
             }).ContinueWith(t => BeginInvoke(() =>
             {
                 running = false;
@@ -307,10 +309,27 @@ namespace NrgToMp3Win
                 {
                     savedCue = cue;
                     status.ForeColor = Color.DarkGreen;
-                    status.Text = $"Saved {Path.GetFileName(cue)} and {Path.GetFileName(bin)} in {took}.";
+                    status.Text = $"Saved {Path.GetFileName(cue)}, {Path.GetFileName(bin)} and the song names ({Path.GetFileName(txt)}) in {took}.";
+                    ShareNames(cue, namesText, status.Text);
                 }
                 UpdateState();
             }));
+        }
+
+        /// <summary>Puts the copied CD's song names on GitHub too (if syncing is on and there's an access key).</summary>
+        async void ShareNames(string cue, string namesText, string saved)
+        {
+            if (!SyncSettings.On || string.IsNullOrWhiteSpace(SyncSettings.Token)) return;
+            status.Text = saved + " Uploading the names to GitHub…";
+            try
+            {
+                await NamesSync.Upload(SyncSettings.Repo, SyncSettings.Token, cue, namesText);
+                status.Text = saved + $" Names uploaded to GitHub ({NamesSync.RemotePath(cue)}).";
+            }
+            catch (Exception ex)
+            {
+                status.Text = saved + " Names not uploaded to GitHub: " + (ex is System.Net.Http.HttpRequestException or TaskCanceledException ? "no internet?" : ex.Message);
+            }
         }
 
         void AddToBurnList()

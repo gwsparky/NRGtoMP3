@@ -156,6 +156,8 @@ final class CDCopier: ObservableObject {
         var k = 2
         while FileManager.default.fileExists(atPath: folder.appendingPathComponent(name + ".cue").path) { name = "\(safe) (\(k))"; k += 1 }
         let cue = folder.appendingPathComponent(name + ".cue"), bin = folder.appendingPathComponent(name + ".bin")
+        let txt = folder.appendingPathComponent(name + ".txt")
+        let namesText = disc.namesText(for: cue)     // the names file, shared with Windows (and GitHub)
         let tracks = cdTracks
         let titles = disc.tracks.map { numberedName($0.number, disc.name($0)) }
         let album = disc.album, artist = disc.artist
@@ -231,6 +233,7 @@ final class CDCopier: ObservableObject {
                     }
                 }
                 try cueText.write(to: cue, atomically: true, encoding: .utf8)
+                try? namesText.write(to: txt, atomically: true, encoding: .utf8)
             } catch { failure = error.localizedDescription }
 
             if rawFD >= 0 { close(rawFD) }
@@ -244,7 +247,20 @@ final class CDCopier: ObservableObject {
                     self.status = failure
                 } else {
                     self.savedCue = cue
-                    self.status = "Saved \(cue.lastPathComponent) and \(bin.lastPathComponent) in \(took)."
+                    let saved = "Saved \(cue.lastPathComponent), \(bin.lastPathComponent) and the song names (\(txt.lastPathComponent)) in \(took)."
+                    self.status = saved
+                    // put the names on GitHub too, so the other computer gets them
+                    if NamesSync.on, let t = NamesSync.token, !t.isEmpty {
+                        self.status = saved + " Uploading the names to GitHub…"
+                        Task { @MainActor in
+                            do {
+                                try await NamesSync.upload(cue, text: namesText)
+                                self.status = saved + " Names uploaded to GitHub (\(NamesSync.remotePath(cue)))."
+                            } catch {
+                                self.status = saved + " Names not uploaded to GitHub: " + NamesSync.describe(error)
+                            }
+                        }
+                    }
                 }
             }
         }
