@@ -21,7 +21,7 @@ Don't assume the other machine's copy has your changes.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **16**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **17**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -67,7 +67,7 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 3. **Player:** add files / disc images / drag, play from a song, pause/resume, ⏮ ⏭ ⏹, Last 10 s, Repeat, volume, ▲▼ ✕, rename, Save/Open Playlist (also opening a playlist saved on the Mac).
 4. **Convert extras:** Play All + ⏮ ⏭ + Last 10 s + highlighting; Check All / Uncheck All / Uncheck All Discs; Merge into one file → the "Name the Merged File" window (pre-filled with the first ticked song's name; Song Name / Album Name buttons); Save Names / Load Names… / automatic loading of `<image>.txt`; Look Up Names (MusicBrainz).
 5. **Background colour:** every tab, the dialogs, and readable text on dark colours.
-6. **Burn CD:** add files / disc images / playlists, gaps (default + per song), Play All, ✂, Save Disc Image, Burn CD (needs a real burner + blank CD-R), the "Add to Burn List" buttons on Convert, Player, Split Song (replaces the song when opened with ✂) and Change Key.
+6. **Burn CD:** add files / disc images / playlists, gaps (default + per song + Apply to All Songs), Play All, ✂, Save Disc Image, Burn CD (needs a real burner + blank CD-R), the "Add to Burn List" buttons on Convert, Player, Split Song (replaces the song when opened with ✂) and Change Key.
 7. **Copy CD:** a music CD is detected within ~3 s, preview, names / Look Up Names, Save Image, Stop, Eject, Open in Convert Tab, Add to Burn List.
 8. **Install on This PC…** (top bar), then uninstall from Settings → Apps.
 

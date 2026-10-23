@@ -68,10 +68,21 @@ namespace NrgToMp3Win
             saveList.Click += (_, _) => SavePlaylist();
             var top = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = true };
             var gapHint = Gray("Use “None” for songs split from one recording.");
-            top.Controls.AddRange(new Control[] { Bold("Gap between songs:"), defaultGap, gapHint });
+            var applyAll = new Button { Text = "Apply to All Songs", AutoSize = true };
+            applyAll.Click += (_, _) =>
+            {
+                if (burn.Items.Count == 0) return;
+                if (grid.IsCurrentCellInEditMode) grid.EndEdit();
+                foreach (var it in burn.Items) it.Gap = null;      // every song follows the gap chosen here
+                burn.NotifyChanged();
+                status.ForeColor = SystemColors.ControlText;
+                status.Text = $"Every song now has a gap of {BurnList.GapLabel(burn.DefaultGap)}.";
+            };
+            top.Controls.AddRange(new Control[] { Bold("Gap between songs:"), defaultGap, applyAll, gapHint });
             top.SetFlowBreak(gapHint, true);
             top.Controls.AddRange(new Control[] { Bold("Disc title:"), discTitle, playAll, stop, openList, saveList });
             var tips = new ToolTip();
+            tips.SetToolTip(applyAll, "Give every song this gap, replacing any gaps set song by song (including a disc image's original gaps)");
             tips.SetToolTip(discTitle, "The disc's name; also the name of a saved disc image");
             tips.SetToolTip(playAll, "Listen to the list in order");
             tips.SetToolTip(saveList, "Save this list (songs, order, names and gaps) to open again later, here or on the Mac");
@@ -124,7 +135,7 @@ namespace NrgToMp3Win
             statusRow.Controls.AddRange(new Control[] { busy, status });
 
             Controls.Add(listPanel); Controls.Add(top); Controls.Add(capRow); Controls.Add(buttons); Controls.Add(burnRow); Controls.Add(statusRow);
-            lockWhileRunning.AddRange(new Control[] { defaultGap, discTitle, openList, saveList, addFiles, addImage, clear, refresh, drives, grid });
+            lockWhileRunning.AddRange(new Control[] { defaultGap, applyAll, discTitle, openList, saveList, addFiles, addImage, clear, refresh, drives, grid });
 
             burn.Changed += () => { if (IsHandleCreated) BeginInvoke(Rebuild); };
             player.Changed += () => { if (IsHandleCreated) BeginInvoke(UpdatePlayButtons); };
