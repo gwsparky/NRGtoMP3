@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MP3 to WAV</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#6b7280; --accent:#2563eb; --border:#d6dae1; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161b; --card:#1e2128; --text:#e7e9ee; --muted:#9aa1ad; --accent:#5b8cff; --border:#353a44; }
+  }
+  body { margin:0; font-family:-apple-system,system-ui,sans-serif; background:var(--bg); color:var(--text); }
+  main { max-width:640px; margin:40px auto; padding:0 16px; }
+  h1 { font-size:1.6rem; margin-bottom:4px; }
+  p.sub { color:var(--muted); margin-top:0; }
+  #drop { border:2px dashed var(--border); border-radius:12px; padding:40px 16px; text-align:center;
+          background:var(--card); cursor:pointer; transition:border-color .15s; }
+  #drop.over { border-color:var(--accent); }
+  ul { list-style:none; padding:0; }
+  li { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px;
+       margin-top:10px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .status { color:var(--muted); font-size:.9rem; white-space:nowrap; }
+  a.dl { background:var(--accent); color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; white-space:nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>MP3 → WAV</h1>
+  <p class="sub">Everything runs locally in your browser — files never leave your Mac.</p>
+  <div id="drop">Drop MP3 files here, or click to choose<input id="file" type="file" accept=".mp3,audio/mpeg" multiple hidden></div>
+  <ul id="list"></ul>
+</main>
+<script>
+const drop = document.getElementById('drop'), input = document.getElementById('file'), list = document.getElementById('list');
+drop.onclick = () => input.click();
+input.onchange = () => { handle(input.files); input.value = ''; };
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); handle(e.dataTransfer.files); };
+
+function handle(files) { for (const f of files) convert(f); }
+
+async function convert(file) {
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="name"></span><span class="status">Converting…</span>`;
+  li.querySelector('.name').textContent = file.name;
+  list.appendChild(li);
+  const status = li.querySelector('.status');
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const audio = await ctx.decodeAudioData(await file.arrayBuffer());
+    ctx.close();
+    const url = URL.createObjectURL(encodeWav(audio));
+    const a = document.createElement('a');
+    a.className = 'dl'; a.href = url;
+    a.download = file.name.replace(/\.[^.]+$/, '') + '.wav';
+    a.textContent = 'Download WAV';
+    status.replaceWith(a);
+  } catch (err) {
+    status.textContent = 'Failed: ' + (err.message || err);
+  }
+}
+
+// 16-bit PCM WAV at the decoded sample rate
+function encodeWav(buf) {
+  const ch = buf.numberOfChannels, rate = buf.sampleRate, len = buf.length;
+  const dataSize = len * ch * 2, out = new DataView(new ArrayBuffer(44 + dataSize));
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) out.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); out.setUint32(4, 36 + dataSize, true); str(8, 'WAVE');
+  str(12, 'fmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, ch, true);
+  out.setUint32(24, rate, true); out.setUint32(28, rate * ch * 2, true); out.setUint16(32, ch * 2, true); out.setUint16(34, 16, true);
+  str(36, 'data'); out.setUint32(40, dataSize, true);
+  const chans = Array.from({ length: ch }, (_, i) => buf.getChannelData(i));
+  let off = 44;
+  for (let i = 0; i < len; i++) for (let c = 0; c < ch; c++) {
+    const s = Math.max(-1, Math.min(1, chans[c][i]));
+    out.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true); off += 2;
+  }
+  return new Blob([out], { type: 'audio/wav' });
+}
+</script>
+</body>
+</html>

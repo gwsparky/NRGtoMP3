@@ -1,0 +1,29 @@
+NRG to MP3 — How to Install
+===========================
+
+Needs: a Mac with Apple silicon (M1, M2, M3, M4 or later) and macOS 13 Ventura or later.
+
+1. Drag "NRG to MP3" onto the "Applications" folder in this window.
+
+2. Open your Applications folder and double-click "NRG to MP3".
+
+3. The first time, macOS will say it can't check the app for malicious software
+   (because it isn't distributed through the App Store). To allow it, once:
+
+     • Click "Done" (or "OK") on that message.
+     • Open  System Settings → Privacy & Security.
+     • Scroll down to the message about "NRG to MP3" and click "Open Anyway".
+     • Enter your password if asked, then click "Open Anyway" again.
+
+   After that it opens normally, like any other app.
+
+   (Alternative for Terminal users: run
+      xattr -dr com.apple.quarantine "/Applications/NRG to MP3.app"
+    then open the app.)
+
+4. Optional: to keep it in the Dock, right-click its Dock icon while it's open
+   and choose Options → Keep in Dock.
+
+Everything the app needs is included — MP3 export works without installing
+anything else. Burning and copying CDs need a CD drive (for example an
+Apple USB SuperDrive).

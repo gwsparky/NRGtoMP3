@@ -1,0 +1,14 @@
+# Build output (recreated by build-app.sh, windows/build-windows.sh or dotnet)
+bin/
+obj/
+dist/
+windows/bin/
+windows/obj/
+
+# Built Mac apps (the source to rebuild them is kept)
+*.app/
+
+# macOS / Windows clutter
+.DS_Store
+Thumbs.db
+desktop.ini

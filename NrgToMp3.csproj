@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>NrgToMp3</RootNamespace>
+    <AssemblyName>NrgToMp3</AssemblyName>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- the Windows app lives in windows/ and is built separately (windows/NrgToMp3Win.csproj) -->
+  <ItemGroup>
+    <Compile Remove="windows/**" />
+    <None Remove="windows/**" />
+  </ItemGroup>
+
+</Project>
