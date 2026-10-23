@@ -4,8 +4,12 @@ A desktop app (Mac **and** Windows) for George's CD archive: it opens Nero `.nrg
 and converts them to MP3/WAV. It also splits songs, changes their key, copies and burns CDs (Mac only so far), and keeps playlists.
 George is not a programmer: explain in plain language, give him clear test steps, and build things for him rather than telling him to.
 
-**The project is edited on one machine at a time.** It moves between George's Mac and his Windows PC by copying this folder.
-Don't assume the other machine's copy has your changes.
+**GitHub (`gwsparky/NRGtoMP3`, branch `main`) is the master copy.** George works in Claude cloud sessions on this repo and
+downloads the ZIP to build on his Mac. At the start of a session, check for other branches (`git ls-remote origin`) and ask
+whether his Mac or PC has changes that aren't on GitHub yet; in October 2026 build 17 sat unnoticed on a side branch
+(`windows-burn-copy`) while `main` was still build 13. Push finished work to `main` (he has asked for that) so the next
+session and his downloads see it. Windows `.exe`s are built in the session and sent with SendUserFile; GitHub releases can't
+be created from a cloud session.
 
 ## Layout
 
