@@ -21,7 +21,7 @@ Don't assume the other machine's copy has your changes.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **13**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **14**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -29,8 +29,20 @@ Don't assume the other machine's copy has your changes.
 - `SongCore.cs`: cross-platform song tools: time parsing and lists, waveform peaks, removing a side, pitch shift (SoundTouch), `SplitPlan`, and `Export` (writes a temp CUE/BIN and runs `Program.Unpack`).
 - `SongUI.cs`: `SongFiles.Decode` (Media Foundation), `SongPlayer` (live pitch), `WaveformView`, `SongOpener` (drop zone + song list with ticks / Combine Selected), `ExportBar`.
 - `SplitTab.cs` (+ `TimeListForm`), `KeyTab.cs`, `PlayerTab.cs`, `PlaylistCore.cs` (`.nrgplaylist` JSON, the same format as the Mac), `Lookup.cs` + `MusicBrainz.cs`.
+- `BurnCore.cs`: **cross-platform** burn list (`BurnList.Shared`, used by every tab's "Add to Burn List"): gaps, capacity, CUE/BIN writing, per-track files for the burner, playlists.
+- `Burner.cs`: burning with IMAPI2 via late-bound COM (`dynamic`) on an STA thread: `MsftRawCDImageCreator` + `MsftDiscFormat2RawCD` (disc-at-once, so exact/zero gaps). Each track file is the song plus the silence before the next one.
+- `BurnTab.cs`: Burn CD tab. ✂ raises `BurnTab.SplitRequested` → `SplitTab.OpenBurnItem`, whose parts replace the song.
+- `CdReader.cs` (`IOCTL_CDROM_READ_TOC` / `IOCTL_CDROM_RAW_READ`, retries then sector-by-sector) + `CopyTab.cs`: Copy CD tab.
+- `Install.cs`: the app installs itself ("Install on This PC…" button): copies the exe to `%LOCALAPPDATA%\Programs\NRG to MP3`, Start-menu/desktop shortcuts, an uninstall entry in HKCU (`--uninstall`).
 
-## Building and running on Windows
+## Building
+
+**From Linux (e.g. a Claude cloud session):** Ubuntu's `dotnet-sdk-8.0` lacks the Windows Desktop targets. Copy
+`sdk/*/Sdks/Microsoft.NET.Sdk.WindowsDesktop` from Microsoft's package
+(`packages.microsoft.com/ubuntu/22.04/prod/pool/main/d/dotnet-sdk-8.0/`, extract with `dpkg-deb -x`) into
+`/usr/lib/dotnet/sdk/<version>/Sdks/`; then the `dotnet publish` commands below work unchanged.
+
+### On Windows
 
 Needs the **.NET 8 SDK** (`winget install Microsoft.DotNet.SDK.8`). From the project folder:
 
@@ -49,19 +61,23 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 
 **Confirmed working on Windows by George:** opening `.nrg` files, song preview, MP3 and WAV export, display scaling (after the fix below).
 
-**Built but not yet tried on Windows**, so test these first and fix what breaks:
+**Built but not yet tried on Windows**, so test these first and fix what breaks (build 14 added 6–8):
 1. **Split Song:** open a song or an image track, waveform (L/R lanes, click to seek, drag red markers), Ctrl+P / Ctrl+K, "Split at" box, Enter Times…, parts grid (play, rename, nudge, typed start, 👂, ✕), Export Parts, ◀ Song List, Combine Selected.
 2. **Change Key:** −/+ half steps (live pitch while playing), Original key → new key name, fine tune, New key / Original, Channels (remove a side; copy or silent) with the waveform following, Export, ◀ Song List, Combine Selected.
 3. **Player:** add files / disc images / drag, play from a song, pause/resume, ⏮ ⏭ ⏹, Last 10 s, Repeat, volume, ▲▼ ✕, rename, Save/Open Playlist (also opening a playlist saved on the Mac).
 4. **Convert extras:** Play All + ⏮ ⏭ + Last 10 s + highlighting; Check All / Uncheck All / Uncheck All Discs; Merge into one file → the "Name the Merged File" window (pre-filled with the first ticked song's name; Song Name / Album Name buttons); Save Names / Load Names… / automatic loading of `<image>.txt`; Look Up Names (MusicBrainz).
 5. **Background colour:** every tab, the dialogs, and readable text on dark colours.
+6. **Burn CD:** add files / disc images / playlists, gaps (default + per song), Play All, ✂, Save Disc Image, Burn CD (needs a real burner + blank CD-R), the "Add to Burn List" buttons on Convert, Player, Split Song (replaces the song when opened with ✂) and Change Key.
+7. **Copy CD:** a music CD is detected within ~3 s, preview, names / Look Up Names, Save Image, Stop, Eject, Open in Convert Tab, Add to Burn List.
+8. **Install on This PC…** (top bar), then uninstall from Settings → Apps.
 
-**Not built yet on Windows** (the Mac has them):
-- **Burn CD tab:** burn audio CDs with exact gaps (0 = seamless), CD-Text, test burn, Save Disc Image (CUE/BIN), Add Disc Image (copy a CD with its original gaps), playlists, ✂ split from the list. The Windows built-in burner (IMAPI2) only does 2-second gaps in track-at-once mode; exact/zero gaps need `IMAPI2.MsftDiscFormat2RawCD` with a raw disc image (`IRawCDImageCreator`).
-- **Copy CD tab:** read an audio CD to CUE/BIN (raw reads: `DeviceIoControl` with `IOCTL_CDROM_READ_TOC` + `IOCTL_CDROM_RAW_READ`), with MusicBrainz lookup, retries for worn discs, elapsed/remaining time.
-- **"Add to Burn List" / "Send to Burn List"** buttons on Convert, Split Song, Change Key and Player (once Burn CD exists).
-- **A Windows installer** (Start-menu shortcut, uninstall entry); currently George just copies the `.exe`.
-- Small difference: the Convert previews and the Player tab use separate players on Windows, so both can sound at once (the Mac shares one).
+`BurnCore.cs` is tested headlessly (images written and read back with `Nrg.Read`: exact gaps, audio identical, playlists round-trip).
+
+**Differences from the Mac still open:**
+- Burn CD on Windows writes **no CD-Text** (song names on the disc) and has **no test burn** or speed choice. CD-Text with the raw burner needs R-W subcode packs (`IRawCDImageCreator.AddSubcodeRWGenerator`).
+- Copy CD doesn't read CD-Text from the disc (names come from MusicBrainz or typing).
+- Burning shows elapsed time, not a percentage (IMAPI2 progress events aren't hooked up).
+- The Convert previews, Player and Burn CD tabs use separate players on Windows, so they can sound at once (the Mac shares one).
 
 ## Problems already found and fixed (don't undo)
 

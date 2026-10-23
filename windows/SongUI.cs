@@ -353,6 +353,7 @@ namespace NrgToMp3Win
         readonly Label folderLabel = new() { AutoSize = true, MaximumSize = new Size(480, 0), Margin = new Padding(3, 7, 3, 3) };
         readonly RadioButton mp3 = new() { Text = "MP3", AutoSize = true }, wav = new() { Text = "WAV", AutoSize = true };
         public readonly Label Status = new() { AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
+        public readonly FlowLayoutPanel Buttons = new() { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft };
         readonly TextBox log = new() { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Font = new Font("Consolas", 9f), BackColor = SystemColors.Window };
         readonly string settingsKey;
         readonly Timer timer = new() { Interval = 500 };
@@ -379,14 +380,16 @@ namespace NrgToMp3Win
             wav.CheckedChanged += (_, _) => { Settings.Set("wav", wav.Checked); Refresh2(); };
             var row1 = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
             row1.Controls.AddRange(new Control[] { new Label { Text = "Save to:", AutoSize = true, Font = new Font("Segoe UI", 9.5f, FontStyle.Bold), Margin = new Padding(3, 7, 3, 3) }, folderLabel, choose, mp3, wav });
-            var row2 = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft };
-            row2.Controls.AddRange(new Control[] { ExportButton, Progress, Status });
-            Controls.Add(log); Controls.Add(row2); Controls.Add(row1);
+            Buttons.Controls.AddRange(new Control[] { ExportButton, Progress, Status });
+            Controls.Add(log); Controls.Add(Buttons); Controls.Add(row1);
             timer.Tick += (_, _) => { if (started is DateTime s) Status.Text = $"Working… {SongCore.Short((DateTime.Now - s).TotalSeconds)} elapsed"; };
             Refresh2();
         }
 
         public void SetLabel(string text) { label = text; Refresh2(); }
+
+        /// <summary>An extra button just left of the export button.</summary>
+        public void AddButton(Button b) { Buttons.Controls.Add(b); Buttons.Controls.SetChildIndex(b, 1); }
 
         public void Refresh2()
         {
@@ -395,7 +398,7 @@ namespace NrgToMp3Win
         }
 
         /// <summary>Runs an export in the background with the converter's output in the log.</summary>
-        public void Run(Func<Action<double>, string> work)
+        public void Run(Func<Action<double>, string> work, bool openFolder = true)
         {
             started = DateTime.Now;
             log.Clear();
@@ -420,7 +423,7 @@ namespace NrgToMp3Win
                 started = null; timer.Stop(); Progress.Visible = false; ExportButton.Enabled = true;
                 bool failed = t.Result == null || log.Text.Contains("FAILED");
                 Status.Text = failed ? "Export failed (see details below)." : $"{t.Result} ({took})";
-                if (!failed && Folder != null) try { System.Diagnostics.Process.Start("explorer.exe", $"\"{Folder}\""); } catch { }
+                if (!failed && openFolder && Folder != null) try { System.Diagnostics.Process.Start("explorer.exe", $"\"{Folder}\""); } catch { }
             }));
         }
 

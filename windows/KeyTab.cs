@@ -93,6 +93,10 @@ namespace NrgToMp3Win
             editor.Controls.Add(row3); editor.Controls.Add(row2); editor.Controls.Add(row1);
 
             export.ExportButton.Click += (_, _) => Export();
+            var toBurn = new Button { Text = "Add to Burn List", AutoSize = true };
+            toBurn.Click += (_, _) => AddToBurnList();
+            new ToolTip().SetToolTip(toBurn, "Add the song in its new key to the list on the Burn CD tab");
+            export.AddButton(toBurn);
             export.Visible = false;
             Controls.Add(editor); Controls.Add(opener); Controls.Add(export); Controls.Add(header);
 
@@ -237,6 +241,19 @@ namespace NrgToMp3Win
                 progress(1);
                 return $"Saved “{name}”.";
             });
+        }
+
+        void AddToBurnList()
+        {
+            if (source == null || export.Running) return;
+            player.Pause();
+            var pcm = changed; double semis = TotalSemitones; string name = NewTitle;
+            export.Run(progress =>
+            {
+                var shifted = SongCore.ShiftPitch(pcm, semis, progress);
+                Invoke(() => BurnList.Shared.Add(new[] { new BurnItem { Title = name, Pcm = shifted, Seconds = SongCore.Seconds(shifted), Note = "Key change" } }));
+                return $"Added “{name}” to the Burn CD list.";
+            }, openFolder: false);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

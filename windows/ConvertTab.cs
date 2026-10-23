@@ -38,6 +38,7 @@ namespace NrgToMp3Win
         readonly Button all = new() { Text = "Check All", AutoSize = true }, none = new() { Text = "Uncheck All", AutoSize = true };
         readonly Button noneAnywhere = new() { Text = "Uncheck All Discs", AutoSize = true };
         readonly Button playAll = new() { Text = "▶ Play All", AutoSize = true };
+        readonly Button addBurn = new() { Text = "Add to Burn List", AutoSize = true };
         readonly DataGridView grid = new()
         {
             Dock = DockStyle.Fill, AllowUserToAddRows = false, AllowUserToDeleteRows = false, AllowUserToResizeRows = false,
@@ -117,7 +118,7 @@ namespace NrgToMp3Win
             var discHeader = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = true };
             discHeader.Controls.Add(discTitle); discHeader.SetFlowBreak(discTitle, true);
             discHeader.Controls.Add(discInfo); discHeader.SetFlowBreak(discInfo, true);
-            discHeader.Controls.AddRange(new Control[] { Gray("Album"), album, Gray("Artist"), artist, lookup, saveNames, loadNames, playAll, all, none });
+            discHeader.Controls.AddRange(new Control[] { Gray("Album"), album, Gray("Artist"), artist, lookup, saveNames, loadNames, playAll, addBurn, all, none });
             discHeader.SetFlowBreak(none, true);
             discHeader.Controls.Add(namesNote);
             discHeader.SetFlowBreak(namesNote, true);
@@ -125,6 +126,16 @@ namespace NrgToMp3Win
             loadNames.Click += (_, _) => LoadNames();
             discHeader.Controls.AddRange(new Control[] { mergeLabel, mergeName, mergeExt });
             playAll.Click += (_, _) => PlayAll(0);
+            addBurn.Click += (_, _) =>
+            {
+                if (Current is not { } d || d.Loading || d.Error != null || d.Selected.Count == 0) return;
+                if (grid.IsCurrentCellInEditMode) grid.EndEdit();
+                if (BurnList.Shared.DiscTitle == "") BurnList.Shared.DiscTitle = d.Album;
+                BurnList.Shared.Add(BurnList.FromTicked(d));
+                d.NamesNote = $"Added {d.Selected.Count} ticked song(s) to the Burn CD list";
+                ShowDisc();
+            };
+            new ToolTip().SetToolTip(addBurn, "Add this disc's ticked songs to the list on the Burn CD tab");
             new ToolTip().SetToolTip(playAll, "Play every song in order, to check the tracks");
 
             grid.Columns.Add(new DataGridViewCheckBoxColumn { HeaderText = "", Width = 30, Name = "use" });
@@ -222,6 +233,8 @@ namespace NrgToMp3Win
             if (d.ShowDialog(this) == DialogResult.OK) Add(d.FileNames);
         }
 
+        public void AddFiles(IEnumerable<string> paths) => Add(paths);
+
         void Add(IEnumerable<string> paths)
         {
             var found = new List<string>();
@@ -266,6 +279,7 @@ namespace NrgToMp3Win
             mergeLabel.Visible = mergeName.Visible = mergeExt.Visible = merge.Checked && ok;
             mergeExt.Text = wav.Checked ? ".wav" : ".mp3";
             playAll.Enabled = ok;
+            addBurn.Enabled = ok && d.Selected.Count > 0;
             grid.Enabled = ok;
             if (d == null)
             {

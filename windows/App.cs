@@ -11,11 +11,12 @@ namespace NrgToMp3Win
     static class App
     {
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            if (Array.IndexOf(args, "--uninstall") >= 0) { Install.Uninstall(); return; }   // from Settings → Apps
             MediaFoundationApi.Startup();       // Windows' own MP3 encoder
             NrgToMp3.Program.Mp3Encoder = Audio.EncodeMp3;
             Application.Run(new MainForm());
@@ -68,7 +69,7 @@ namespace NrgToMp3Win
 
     class MainForm : Form
     {
-        public const int Build = 13;   // shown in the title bar, to tell test versions apart
+        public const int Build = 14;   // shown in the title bar, to tell test versions apart
 
         public MainForm()
         {
@@ -81,13 +82,19 @@ namespace NrgToMp3Win
             Font = new Font("Segoe UI", 9.5f);
 
             var tabs = new TabControl { Dock = DockStyle.Fill, Padding = new Point(14, 5) };
-            tabs.TabPages.Add(Page("Convert", new ConvertTab()));
+            var convert = new ConvertTab();
+            var split = new SplitTab();
+            tabs.TabPages.Add(Page("Convert", convert));
             tabs.TabPages.Add(Page("Player", new PlayerTab()));
-            foreach (var name in new[] { "Burn CD", "Copy CD" })
-                tabs.TabPages.Add(Page(name, ComingSoon(name)));
-            tabs.TabPages.Add(Page("Split Song", new SplitTab()));
+            tabs.TabPages.Add(Page("Burn CD", new BurnTab()));
+            tabs.TabPages.Add(Page("Copy CD", new CopyTab()));
+            tabs.TabPages.Add(Page("Split Song", split));
             tabs.TabPages.Add(Page("Change Key", new KeyTab()));
             Controls.Add(tabs);
+            // links between tabs
+            CopyTab.OpenInConvert += cue => { convert.AddFiles(new[] { cue }); tabs.SelectedIndex = 0; };
+            BurnTab.SplitRequested += item => { split.OpenBurnItem(item); tabs.SelectedIndex = 4; };
+            split.BackToBurnList += () => tabs.SelectedIndex = 2;
 
             // background colour: a slim bar above the tabs
             var pick = new Button { Text = "Background colour…", AutoSize = true };
@@ -100,6 +107,13 @@ namespace NrgToMp3Win
             reset.Click += (_, _) => { Theme.Set(this, null); reset.Visible = false; };
             var bar = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft };
             bar.Controls.AddRange(new Control[] { reset, pick });
+            if (!Install.RunningInstalled)
+            {
+                var install = new Button { Text = Install.IsInstalled ? "Update Installed Copy…" : "Install on This PC…", AutoSize = true };
+                install.Click += (_, _) => Install.Run(this);
+                new ToolTip().SetToolTip(install, "Add NRG to MP3 to the Start menu (and Settings → Apps, to remove it later)");
+                bar.Controls.Add(install);
+            }
             Controls.Add(bar);
             Theme.Load();
             reset.Visible = Theme.Background != null;
@@ -126,13 +140,5 @@ namespace NrgToMp3Win
             page.Controls.Add(content);
             return page;
         }
-
-        static Control ComingSoon(string name) => new Label
-        {
-            Text = $"{name} is coming in the next stage of the Windows version.",
-            TextAlign = ContentAlignment.MiddleCenter,
-            ForeColor = SystemColors.GrayText,
-            Font = new Font("Segoe UI", 12f),
-        };
     }
 }

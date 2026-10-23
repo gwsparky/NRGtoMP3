@@ -101,11 +101,21 @@ namespace NrgToMp3Win
             var addFiles = new Button { Text = "Add Files…", AutoSize = true };
             var addImage = new Button { Text = "Add Disc Image…", AutoSize = true };
             var clear = new Button { Text = "Clear", AutoSize = true };
+            var toBurn = new Button { Text = "Send to Burn List", AutoSize = true };
+            toBurn.Click += (_, _) =>
+            {
+                if (songs.Count == 0) return;
+                if (grid.IsCurrentCellInEditMode) grid.EndEdit();
+                if (BurnList.Shared.DiscTitle == "") BurnList.Shared.DiscTitle = name.Text.Trim();
+                BurnList.Shared.Add(songs.Select(BurnItem.FromPlayer));
+                status.Text = $"Added {songs.Count} song(s) to the Burn CD list.";
+            };
+            new ToolTip().SetToolTip(toBurn, "Add every song in this playlist to the list on the Burn CD tab");
             addFiles.Click += (_, _) => { using var d = new OpenFileDialog { Multiselect = true, Filter = "Songs|*.wav;*.mp3;*.m4a;*.aif;*.aiff;*.wma;*.flac;*.aac|All files|*.*" }; if (d.ShowDialog(this) == DialogResult.OK) Add(d.FileNames); };
             addImage.Click += (_, _) => { using var d = new OpenFileDialog { Multiselect = true, Filter = "Disc images (*.nrg;*.cue)|*.nrg;*.cue" }; if (d.ShowDialog(this) == DialogResult.OK) Add(d.FileNames); };
             clear.Click += (_, _) => { player.Stop(); songs.Clear(); Rebuild(); };
             var bottom = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            bottom.Controls.AddRange(new Control[] { addFiles, addImage, clear, summary });
+            bottom.Controls.AddRange(new Control[] { addFiles, addImage, clear, toBurn, summary });
             var hint = new Label { Dock = DockStyle.Bottom, AutoSize = true, ForeColor = SystemColors.GrayText, Text = "Drag songs (WAV, MP3, M4A, …), .nrg / .cue disc images or saved playlists onto this tab. Double-click a song to play from there." };
 
             Controls.Add(grid); Controls.Add(listHeader); Controls.Add(nowPanel); Controls.Add(hint); Controls.Add(bottom); Controls.Add(status);

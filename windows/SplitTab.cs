@@ -10,6 +10,11 @@ namespace NrgToMp3Win
     class SplitTab : UserControl
     {
         SplitPlan plan;
+        BurnItem fromBurnList;            // the song came from the Burn CD list (✂): its parts replace it there
+        readonly Button toBurn = new() { Text = "Send Parts to Burn List", AutoSize = true };
+
+        /// <summary>Raised after parts replace a song on the burn list, to go back to the Burn CD tab.</summary>
+        public event Action BackToBurnList;
         (float[] l, float[] r) peaks;
         readonly SongOpener opener = new("split it") { Dock = DockStyle.Fill };
         readonly Panel editor = new() { Dock = DockStyle.Fill, Visible = false };
@@ -80,6 +85,9 @@ namespace NrgToMp3Win
             editor.Controls.Add(gridPanel); editor.Controls.Add(transport); editor.Controls.Add(wave);
 
             export.ExportButton.Click += (_, _) => Export();
+            toBurn.Click += (_, _) => SendToBurnList();
+            new ToolTip().SetToolTip(toBurn, "Put the parts on the Burn CD list as separate tracks with no gap between them");
+            export.AddButton(toBurn);
             export.Visible = false;
 
             Controls.Add(editor); Controls.Add(opener); Controls.Add(export); Controls.Add(header);
@@ -90,7 +98,23 @@ namespace NrgToMp3Win
             ShowState();
         }
 
-        void LoadSong(string name, byte[] pcm)
+        void LoadSong(string name, byte[] pcm) { fromBurnList = null; Show(name, pcm); }
+
+        /// <summary>Opens a song from the Burn CD list (its ✂ button).</summary>
+        public void OpenBurnItem(BurnItem item)
+        {
+            player.Load(null); plan = null; fromBurnList = null;
+            opener.ShowIdle(); ShowState();
+            title.Text = $"✂ Reading “{item.Title}”…";
+            System.Threading.Tasks.Task.Run(() => item.Load(SongFiles.Decode)).ContinueWith(t => BeginInvoke(() =>
+            {
+                if (t.IsFaulted) { title.Text = "✂ Couldn't read the song: " + t.Exception.InnerException.Message; return; }
+                fromBurnList = item;
+                Show(item.Title, t.Result);
+            }));
+        }
+
+        void Show(string name, byte[] pcm)
         {
             plan = new SplitPlan(name, pcm);
             peaks = SongCore.Peaks(pcm);
@@ -101,9 +125,27 @@ namespace NrgToMp3Win
             Changed();
         }
 
-        void Close() { player.Load(null); plan = null; opener.ShowIdle(); ShowState(); }
+        void Close() { player.Load(null); plan = null; fromBurnList = null; opener.ShowIdle(); ShowState(); }
 
-        void BackToList() { player.Load(null); plan = null; opener.ShowList(); ShowState(); }
+        void BackToList() { player.Load(null); plan = null; fromBurnList = null; opener.ShowList(); ShowState(); }
+
+        /// <summary>The parts, one after another with no gap, onto the burn list (in place of the song if it came from there).</summary>
+        void SendToBurnList()
+        {
+            if (plan == null || plan.Markers.Count == 0) return;
+            if (grid.IsCurrentCellInEditMode) grid.EndEdit();
+            player.Pause();
+            var parts = plan.MakeParts().Select((p, k) => new BurnItem
+            {
+                Title = p.title, Pcm = p.pcm, Seconds = SongCore.Seconds(p.pcm), Note = $"Part {k + 1} of {plan.Title}", Gap = k == 0 ? fromBurnList?.Gap : 0,
+            }).ToList();
+            var list = BurnList.Shared;
+            int at = fromBurnList == null ? -1 : list.Items.IndexOf(fromBurnList);
+            if (at >= 0) { list.Items.RemoveAt(at); list.Items.InsertRange(at, parts); list.NotifyChanged(); }
+            else list.Add(parts);
+            export.Status.Text = at >= 0 ? $"Replaced “{plan.Title}” on the Burn CD list with {parts.Count} parts." : $"Added {parts.Count} parts to the Burn CD list.";
+            if (at >= 0) { Close(); BackToBurnList?.Invoke(); }
+        }
 
         void ShowState()
         {
@@ -124,6 +166,8 @@ namespace NrgToMp3Win
                 : $"{plan.Parts} tracks. They follow each other with no gap, so the music plays straight through.";
             export.SetLabel(plan.Markers.Count == 0 ? "Export Parts as" : $"Export {plan.Parts} Parts as");
             export.ExportButton.Enabled = plan.Markers.Count > 0 && !export.Running;
+            toBurn.Enabled = plan.Markers.Count > 0;
+            toBurn.Text = fromBurnList != null ? "Replace on Burn List" : "Send Parts to Burn List";
             if (grid.IsCurrentCellInEditMode) return;   // don't rebuild under someone typing
             building = true;
             grid.Rows.Clear();
