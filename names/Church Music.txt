@@ -1,4 +1,4 @@
-# Song names for Church Music.cue
+# Song names for Church Music.nrg
 # One song per line: a number, then the name. Lines starting with # are ignored.
 Album: Church Music
 Artist: Various
@@ -11,7 +11,7 @@ Artist: Various
 7. Track 07
 8. Track 08
 9. My Rendeemer Lives!
-10. Track 10
+10. Test 10
 11. Track 11
 12. Track 12
 13. Track 13
