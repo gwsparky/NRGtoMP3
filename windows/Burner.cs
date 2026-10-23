@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -78,62 +79,100 @@ namespace NrgToMp3Win
             };
         }
 
+        /// <summary>Thrown when the drive won't burn with exact gaps; the standard (2-second gap) way may still work.</summary>
+        public class ExactGapsFailed : Exception { public ExactGapsFailed(string m) : base(m) { } }
+
         /// <summary>Burns one raw CD-audio file per track (each already followed by the gap before the next song).
-        /// The first song gets the standard 2-second lead-in. Blocks until done; throws with a readable message on failure.</summary>
+        /// The first song gets the standard 2-second lead-in. Tries each raw layout the drive offers; throws
+        /// <see cref="ExactGapsFailed"/> if none works (nothing has been written then), other errors as readable messages.</summary>
         public static void Burn(string driveId, IList<string> trackFiles, bool eject, Action<string> status)
         {
             OnComThread<object>(() =>
             {
                 dynamic rec = Create("IMAPI2.MsftDiscRecorder2");
                 rec.InitializeDiscRecorder(driveId);
-                dynamic fmt = Create("IMAPI2.MsftDiscFormat2RawCD");
-                fmt.Recorder = rec;
-                fmt.ClientName = "NRG to MP3";
+                dynamic probe = Create("IMAPI2.MsftDiscFormat2RawCD");
+                probe.Recorder = rec;
                 try
                 {
-                    if (!fmt.IsCurrentMediaSupported(rec)) throw new InvalidOperationException("The disc in the burner can't be used for an audio CD. Insert a blank CD-R.");
+                    if (!probe.IsCurrentMediaSupported(rec)) throw new InvalidOperationException("The disc in the burner can't be used for an audio CD. Insert a blank CD-R.");
                 }
                 catch (COMException ex) { throw new InvalidOperationException(Message(ex)); }
 
-                // the sector layout this drive can write
+                // the raw layouts this drive says it can write, best first; then the others, as some drives misreport
                 var supported = new List<int>();
-                try { foreach (object v in (object[])fmt.SupportedSectorTypes) supported.Add(Convert.ToInt32(v)); } catch { }
-                int type = SectorTypes[^1];
-                foreach (int t in SectorTypes) if (supported.Contains(t)) { type = t; break; }
+                try { foreach (object v in (object[])probe.SupportedSectorTypes) supported.Add(Convert.ToInt32(v)); } catch { }
+                var order = SectorTypes.Where(supported.Contains).Concat(SectorTypes.Where(t => !supported.Contains(t))).ToList();
 
-                // Microsoft's order: prepare the disc, build the layout to fit it, then write.
-                // Some drives forget "prepared" (error C0AA0602) while the layout is built; then prepare again once.
-                string step = "getting the disc ready";
+                string lastError = null;
+                foreach (int type in order)
+                {
+                    // a fresh burner object for each try, so nothing is left over from a failed one
+                    dynamic fmt = Create("IMAPI2.MsftDiscFormat2RawCD");
+                    fmt.Recorder = rec;
+                    fmt.ClientName = "NRG to MP3";
+                    bool writing = false;
+                    try
+                    {
+                        status("Getting the disc ready…");
+                        fmt.RequestedSectorType = type;
+                        fmt.PrepareMedia();
+                        try
+                        {
+                            status("Building the disc layout…");
+                            dynamic image = Create("IMAPI2.MsftRawCDImageCreator");
+                            image.ResultingImageType = type;
+                            image.DisableGaplessAudio = false;    // songs follow each other exactly; the gaps are in the audio itself
+                            foreach (var f in trackFiles) image.AddTrack(SectorAudio, Stream(f));
+                            object result = image.CreateResultImage();
+                            status("Burning… this takes a few minutes. Don't open the drive.");
+                            writing = true;
+                            fmt.WriteMedia(result);
+                        }
+                        finally { try { fmt.ReleaseMedia(); } catch { } }
+                        if (eject) try { rec.EjectMedia(); } catch { }
+                        return null;
+                    }
+                    catch (COMException ex)
+                    {
+                        lastError = Message(ex);
+                        uint code = unchecked((uint)ex.HResult);
+                        // once writing has really started, the disc is used: don't try again on it
+                        if (writing && code != 0xC0AA0602) throw new InvalidOperationException(lastError + " (while burning)");
+                    }
+                }
+                throw new ExactGapsFailed(lastError ?? "This burner can't burn with exact gaps.");
+            });
+        }
+
+        /// <summary>Windows' standard way to burn audio CDs (track-at-once): works on nearly every burner, but always puts
+        /// 2 seconds of silence between songs. <paramref name="songFiles"/> are the songs alone, without gaps.</summary>
+        public static void BurnStandard(string driveId, IList<string> songFiles, bool eject, Action<string> status)
+        {
+            OnComThread<object>(() =>
+            {
+                dynamic rec = Create("IMAPI2.MsftDiscRecorder2");
+                rec.InitializeDiscRecorder(driveId);
+                dynamic fmt = Create("IMAPI2.MsftDiscFormat2TrackAtOnce");
+                fmt.Recorder = rec;
+                fmt.ClientName = "NRG to MP3";
+                int song = 0;
                 try
                 {
                     status("Getting the disc ready…");
-                    fmt.RequestedSectorType = type;
                     fmt.PrepareMedia();
                     try
                     {
-                        step = "building the disc layout";
-                        status("Building the disc layout…");
-                        dynamic image = Create("IMAPI2.MsftRawCDImageCreator");
-                        image.ResultingImageType = type;
-                        image.DisableGaplessAudio = false;    // songs follow each other exactly; the gaps are in the audio itself
-                        try { image.StartOfLeadoutLimit = fmt.LastPossibleStartOfLeadout; } catch { }
-                        foreach (var f in trackFiles) image.AddTrack(SectorAudio, Stream(f));
-                        object result = image.CreateResultImage();
-
-                        step = "burning";
-                        status("Burning… this takes a few minutes. Don't open the drive.");
-                        try { fmt.WriteMedia(result); }
-                        catch (COMException ex) when (unchecked((uint)ex.HResult) == 0xC0AA0602)
+                        foreach (var f in songFiles)
                         {
-                            step = "burning (second try)";
-                            try { fmt.ReleaseMedia(); } catch { }
-                            fmt.PrepareMedia();
-                            fmt.WriteMedia(result);
+                            song++;
+                            status($"Burning song {song} of {songFiles.Count}… Don't open the drive.");
+                            fmt.AddAudioTrack(Stream(f));
                         }
                     }
-                    finally { try { fmt.ReleaseMedia(); } catch { } }
+                    finally { status("Finishing the disc…"); try { fmt.ReleaseMedia(); } catch { } }
                 }
-                catch (COMException ex) { throw new InvalidOperationException($"{Message(ex)} (while {step})"); }
+                catch (COMException ex) { throw new InvalidOperationException(Message(ex) + (song > 0 ? $" (while burning song {song})" : " (while getting the disc ready)")); }
                 if (eject) try { rec.EjectMedia(); } catch { }
                 return null;
             });

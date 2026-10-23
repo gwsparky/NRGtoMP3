@@ -141,7 +141,7 @@ namespace NrgToMp3Win
 
         /// <summary>One raw audio file per CD track for the burner: each song followed by the silence before the next
         /// one, so the songs sit exactly that far apart on the disc (no gap = seamless).</summary>
-        public List<string> WriteTracks(string folder, Func<string, byte[]> decode, Action<string> progress)
+        public List<string> WriteTracks(string folder, Func<string, byte[]> decode, Action<string> progress, bool withGaps = true)
         {
             var files = new List<string>();
             for (int i = 0; i < Items.Count; i++)
@@ -153,7 +153,7 @@ namespace NrgToMp3Win
                     var pcm = Items[i].Load(decode);
                     f.Write(pcm, 0, pcm.Length);
                     Pad(f, pcm.Length);
-                    if (i + 1 < Items.Count) Silence(f, Sectors(GapAt(i + 1)));
+                    if (withGaps && i + 1 < Items.Count) Silence(f, Sectors(GapAt(i + 1)));
                 }
                 files.Add(path);
             }

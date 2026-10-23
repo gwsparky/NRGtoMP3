@@ -21,7 +21,7 @@ Don't assume the other machine's copy has your changes.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **15**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **16**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -30,7 +30,7 @@ Don't assume the other machine's copy has your changes.
 - `SongUI.cs`: `SongFiles.Decode` (Media Foundation), `SongPlayer` (live pitch), `WaveformView`, `SongOpener` (drop zone + song list with ticks / Combine Selected), `ExportBar`.
 - `SplitTab.cs` (+ `TimeListForm`), `KeyTab.cs`, `PlayerTab.cs`, `PlaylistCore.cs` (`.nrgplaylist` JSON, the same format as the Mac), `Lookup.cs` + `MusicBrainz.cs`.
 - `BurnCore.cs`: **cross-platform** burn list (`BurnList.Shared`, used by every tab's "Add to Burn List"): gaps, capacity, CUE/BIN writing, per-track files for the burner, playlists.
-- `Burner.cs`: burning with IMAPI2 via late-bound COM (`dynamic`) on an STA thread: `MsftRawCDImageCreator` + `MsftDiscFormat2RawCD` (disc-at-once, so exact/zero gaps). Each track file is the song plus the silence before the next one.
+- `Burner.cs`: burning with IMAPI2 via late-bound COM (`dynamic`) on an STA thread: `MsftRawCDImageCreator` + `MsftDiscFormat2RawCD` (disc-at-once, so exact/zero gaps). Each track file is the song plus the silence before the next one. Tries each raw sector type; if all fail (George's burner gave C0AA0602 "media not prepared" in builds 14–15), `BurnTab` offers `Burner.BurnStandard` (`MsftDiscFormat2TrackAtOnce`, always 2 s gaps).
 - `BurnTab.cs`: Burn CD tab. ✂ raises `BurnTab.SplitRequested` → `SplitTab.OpenBurnItem`, whose parts replace the song.
 - `CdReader.cs` (`IOCTL_CDROM_READ_TOC` / `IOCTL_CDROM_RAW_READ`, retries then sector-by-sector) + `CopyTab.cs`: Copy CD tab.
 - `Install.cs`: the app installs itself ("Install on This PC…" button): copies the exe to `%LOCALAPPDATA%\Programs\NRG to MP3`, Start-menu/desktop shortcuts, an uninstall entry in HKCU (`--uninstall`).

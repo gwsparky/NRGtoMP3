@@ -400,8 +400,39 @@ namespace NrgToMp3Win
                 finally { try { Directory.Delete(temp, true); } catch { } }
             }).ContinueWith(t => BeginInvoke(() =>
             {
-                if (t.IsFaulted) Finish("Burn failed: " + (t.Exception.InnerException?.Message ?? t.Exception.Message), false);
+                var error = t.Exception?.InnerException;
+                if (error is Burner.ExactGapsFailed) { OfferStandardBurn(drive, ejectAfter, error.Message); return; }
+                if (t.IsFaulted) Finish("Burn failed: " + (error?.Message ?? t.Exception.Message), false);
                 else Finish($"Burn complete in {SongCore.Short((DateTime.Now - started).TotalSeconds)}.", true);
+            }));
+        }
+
+        /// <summary>The burner wouldn't burn with exact gaps (nothing was written): offer Windows' standard way instead.</summary>
+        void OfferStandardBurn(Burner.Drive drive, bool ejectAfter, string why)
+        {
+            if (MessageBox.Show(this, "This burner wouldn't burn the CD with your exact gaps. Nothing was written, so the disc is still blank.\n\n"
+                                    + $"Windows said: {why}\n\n"
+                                    + "Burn it the standard way instead? Every song then has a 2-second gap before it, whatever gaps you chose.",
+                                "Burn CD", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                Finish("Not burned. Tip: Save Disc Image… makes a CUE/BIN you can burn with another program.", false);
+                return;
+            }
+            string temp = Path.Combine(Path.GetTempPath(), "nrg-burn-" + Guid.NewGuid().ToString("N"));
+            runningText = "Preparing the songs…";
+            Task.Run(() =>
+            {
+                Directory.CreateDirectory(temp);
+                try
+                {
+                    var files = burn.WriteTracks(temp, Decode, s => BeginInvoke(() => runningText = s), withGaps: false);
+                    Burner.BurnStandard(drive.Id, files, ejectAfter, s => BeginInvoke(() => runningText = s));
+                }
+                finally { try { Directory.Delete(temp, true); } catch { } }
+            }).ContinueWith(t => BeginInvoke(() =>
+            {
+                if (t.IsFaulted) Finish("Burn failed: " + (t.Exception.InnerException?.Message ?? t.Exception.Message), false);
+                else Finish($"Burn complete in {SongCore.Short((DateTime.Now - started).TotalSeconds)} (standard 2-second gaps).", true);
             }));
         }
 
