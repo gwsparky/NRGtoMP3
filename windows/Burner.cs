@@ -101,22 +101,39 @@ namespace NrgToMp3Win
                 int type = SectorTypes[^1];
                 foreach (int t in SectorTypes) if (supported.Contains(t)) { type = t; break; }
 
-                status("Building the disc layout…");
-                dynamic image = Create("IMAPI2.MsftRawCDImageCreator");
-                image.ResultingImageType = type;
-                image.DisableGaplessAudio = false;    // songs follow each other exactly; the gaps are in the audio itself
-                foreach (var f in trackFiles) image.AddTrack(SectorAudio, Stream(f));
-                object result = image.CreateResultImage();
-
+                // Microsoft's order: prepare the disc, build the layout to fit it, then write.
+                // Some drives forget "prepared" (error C0AA0602) while the layout is built; then prepare again once.
+                string step = "getting the disc ready";
                 try
                 {
-                    status("Burning… this takes a few minutes. Don't open the drive.");
+                    status("Getting the disc ready…");
                     fmt.RequestedSectorType = type;
                     fmt.PrepareMedia();
-                    try { fmt.WriteMedia(result); }
+                    try
+                    {
+                        step = "building the disc layout";
+                        status("Building the disc layout…");
+                        dynamic image = Create("IMAPI2.MsftRawCDImageCreator");
+                        image.ResultingImageType = type;
+                        image.DisableGaplessAudio = false;    // songs follow each other exactly; the gaps are in the audio itself
+                        try { image.StartOfLeadoutLimit = fmt.LastPossibleStartOfLeadout; } catch { }
+                        foreach (var f in trackFiles) image.AddTrack(SectorAudio, Stream(f));
+                        object result = image.CreateResultImage();
+
+                        step = "burning";
+                        status("Burning… this takes a few minutes. Don't open the drive.");
+                        try { fmt.WriteMedia(result); }
+                        catch (COMException ex) when (unchecked((uint)ex.HResult) == 0xC0AA0602)
+                        {
+                            step = "burning (second try)";
+                            try { fmt.ReleaseMedia(); } catch { }
+                            fmt.PrepareMedia();
+                            fmt.WriteMedia(result);
+                        }
+                    }
                     finally { try { fmt.ReleaseMedia(); } catch { } }
                 }
-                catch (COMException ex) { throw new InvalidOperationException(Message(ex)); }
+                catch (COMException ex) { throw new InvalidOperationException($"{Message(ex)} (while {step})"); }
                 if (eject) try { rec.EjectMedia(); } catch { }
                 return null;
             });

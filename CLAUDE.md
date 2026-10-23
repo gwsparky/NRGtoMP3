@@ -21,7 +21,7 @@ Don't assume the other machine's copy has your changes.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **14**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. **`MainForm.Build`** is the test-build number shown in the title bar; bump it with every build George tests (currently **15**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
