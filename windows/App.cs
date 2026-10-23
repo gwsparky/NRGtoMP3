@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
 using NAudio.MediaFoundation;
@@ -86,12 +87,15 @@ namespace NrgToMp3Win
 
     class MainForm : Form
     {
-        public const int Build = 19;   // shown in the title bar, to tell test versions apart
+        // shown in the title bar, to tell test versions apart; comes from the BUILD file, shared with the Mac app
+        public static readonly int Build = int.TryParse(System.Reflection.Assembly.GetExecutingAssembly()
+            .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
+            .OfType<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "Build")?.Value, out var b) ? b : 0;
 
         public MainForm()
         {
             SuspendLayout();
-            Text = $"NRG to MP3 (Windows test build {Build})";
+            Text = $"NRG to MP3 (Windows build {Build})";
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
             ClientSize = new Size(1100, 760);
             MinimumSize = new Size(900, 620);

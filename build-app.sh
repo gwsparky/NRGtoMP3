@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 # Assemble and sign outside the Desktop: iCloud Drive keeps adding Finder info there, which codesign rejects.
 WORK=$(mktemp -d)
 APP="$WORK/NRG to MP3.app"
+BUILD=$(tr -d '[:space:]' < BUILD)   # the build number, shared with the Windows app
 dotnet publish NrgToMp3.csproj -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o dist/cli
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -32,6 +33,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleVersion</key><string>$BUILD</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
@@ -41,7 +43,7 @@ codesign --force --deep -s - "$APP"
 rm -rf "dist/NRG to MP3.app"
 ditto "$APP" "dist/NRG to MP3.app"
 codesign -v "dist/NRG to MP3.app"
-echo "Built dist/NRG to MP3.app"
+echo "Built dist/NRG to MP3.app (build $BUILD)"
 
 # Installer: a disk image with the app, a shortcut to Applications to drag it onto, and the install guide
 DMG="dist/NRG to MP3 Installer.dmg"
