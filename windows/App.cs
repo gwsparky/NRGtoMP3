@@ -50,6 +50,23 @@ namespace NrgToMp3Win
         }
 
         public static void Set(string key, bool value) => Set(key, value ? "true" : "false");
+
+        /// <summary>A password-like value, scrambled with Windows' own protection so only this Windows account can read it.</summary>
+        public static string GetSecret(string key)
+        {
+            try
+            {
+                var v = Get(key);
+                if (string.IsNullOrEmpty(v)) return null;
+                var bytes = System.Security.Cryptography.ProtectedData.Unprotect(Convert.FromBase64String(v), null, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+                return System.Text.Encoding.UTF8.GetString(bytes);
+            }
+            catch { return null; }
+        }
+
+        public static void SetSecret(string key, string value) =>
+            Set(key, string.IsNullOrWhiteSpace(value) ? null : Convert.ToBase64String(System.Security.Cryptography.ProtectedData.Protect(
+                System.Text.Encoding.UTF8.GetBytes(value.Trim()), null, System.Security.Cryptography.DataProtectionScope.CurrentUser)));
     }
 
     /// <summary>The layout is written for 100% display scaling (96 DPI). Text grows with Windows' scale setting
@@ -69,7 +86,7 @@ namespace NrgToMp3Win
 
     class MainForm : Form
     {
-        public const int Build = 17;   // shown in the title bar, to tell test versions apart
+        public const int Build = 18;   // shown in the title bar, to tell test versions apart
 
         public MainForm()
         {

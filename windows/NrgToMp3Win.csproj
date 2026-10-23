@@ -25,6 +25,8 @@
     <!-- the same disc-image reading and converting code the Mac app uses -->
     <Compile Include="../Nrg.cs;../Wav.cs;../Id3.cs;../Program.cs" />
     <PackageReference Include="NAudio" Version="2.2.1" />
+    <!-- keeps the GitHub access key unreadable to other Windows accounts -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <!-- pitch shifting for Change Key (LGPL) -->
     <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2" />

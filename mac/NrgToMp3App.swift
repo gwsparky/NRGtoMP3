@@ -192,6 +192,8 @@ final class Converter: ObservableObject {
                     let n = d.applyNames(text)
                     d.namesNote = "\(n) name(s) loaded from \(d.namesFile.lastPathComponent)"
                 }
+                // names edited on github.com replace them
+                if d.error == nil, !d.tracks.isEmpty, NamesSync.on { Task { await NamesSync.pull(d, automatic: true) } }
                 self.objectWillChange.send()
             }
         }
@@ -620,6 +622,7 @@ struct DiscSection: View {
     let onRemove: () -> Void
     let onAddToBurn: () -> Void
     @State private var lookingUp = false
+    @State private var syncSetup = false
 
     func pid(_ t: TrackInfo) -> String { disc.url.path + "#\(t.number)" }
 
@@ -628,6 +631,7 @@ struct DiscSection: View {
         do {
             try text.write(to: disc.namesFile, atomically: true, encoding: .utf8)
             disc.namesNote = "Names saved to \(disc.namesFile.lastPathComponent); they'll load automatically next time"
+            Task { await NamesSync.push(disc, text: text) }
         } catch {
             // the image's folder may be read-only (e.g. on a CD): save somewhere else instead
             let panel = NSSavePanel()
@@ -635,7 +639,10 @@ struct DiscSection: View {
             panel.allowedContentTypes = [.plainText]
             panel.message = "Couldn't save next to the image. Choose where to save the names file."
             if panel.runModal() == .OK, let url = panel.url {
-                do { try text.write(to: url, atomically: true, encoding: .utf8); disc.namesNote = "Names saved to \(url.lastPathComponent)" }
+                do {
+                    try text.write(to: url, atomically: true, encoding: .utf8); disc.namesNote = "Names saved to \(url.lastPathComponent)"
+                    Task { await NamesSync.push(disc, text: text) }
+                }
                 catch { disc.namesNote = "Couldn't save the names: \(error.localizedDescription)" }
             }
         }
@@ -751,6 +758,11 @@ struct DiscSection: View {
                         Button("Load Names…") { loadNames() }
                             .disabled(disabled)
                             .help("Read song names from a text file: one song per line, e.g. \"1. Amazing Grace\"")
+                        Button("Get from GitHub") { Task { await NamesSync.pull(disc, automatic: false) } }
+                            .disabled(disabled || !NamesSync.on)
+                            .help("Load the names for this disc from the \"names\" folder on GitHub (e.g. after editing them on github.com)")
+                        Button("GitHub…") { syncSetup = true }
+                            .help("Turn GitHub name syncing on or off, and add the access key that lets Save Names upload")
                     }
                     .disabled(disabled)
                     if let note = disc.namesNote {
@@ -773,6 +785,7 @@ struct DiscSection: View {
             .background(headerBackground)
             .overlay(alignment: .bottom) { Divider() }
             .sheet(isPresented: $lookingUp) { LookupSheet(disc: disc) }
+            .sheet(isPresented: $syncSetup) { NamesSyncSheet() }
         }
     }
 }
