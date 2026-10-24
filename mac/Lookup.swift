@@ -110,7 +110,12 @@ enum MusicBrainz {
 // MARK: - Lookup window
 
 struct LookupSheet: View {
-    @ObservedObject var disc: Disc
+    let heading: String                  // what's being named, shown under the title
+    let count: Int                       // number of songs
+    let toc: TOC?                        // track layout, for Match Disc
+    let startAlbum: String
+    let startArtist: String
+    let onApply: (MBTracks) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var album = ""
     @State private var artist = ""
@@ -123,13 +128,13 @@ struct LookupSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Look Up Song Names").font(.title2).bold()
-            Text(disc.url.lastPathComponent + " · \(disc.tracks.count) songs").foregroundStyle(.secondary)
+            Text(heading + " · \(count) songs").foregroundStyle(.secondary)
 
             HStack {
                 TextField("Album", text: $album).onSubmit(search)
                 TextField("Artist (optional)", text: $artist).onSubmit(search)
                 Button("Search", action: search).disabled(busy || (album.isEmpty && artist.isEmpty))
-                if disc.toc != nil {
+                if toc != nil {
                     Button("Match Disc") { matchDisc() }.disabled(busy)
                         .help("Find this exact CD on MusicBrainz by its track layout")
                 }
@@ -141,7 +146,7 @@ struct LookupSheet: View {
                         Text(r.title).bold()
                         Text([r.artist, r.date, r.country, "\(r.trackCount) songs"].filter { !$0.isEmpty }.joined(separator: " · "))
                             .font(.caption)
-                            .foregroundStyle(r.trackCount == disc.tracks.count ? Color.green : Color.secondary)
+                            .foregroundStyle(r.trackCount == count ? Color.green : Color.secondary)
                     }
                     .tag(r.id)
                 }
@@ -151,8 +156,8 @@ struct LookupSheet: View {
                     if let p = preview {
                         Text(p.album).bold()
                         Text(p.artist).font(.caption).foregroundStyle(.secondary)
-                        if p.titles.count != disc.tracks.count {
-                            Text("This release has \(p.titles.count) songs; your disc has \(disc.tracks.count). Names will be applied in order.")
+                        if p.titles.count != count {
+                            Text("This release has \(p.titles.count) songs; your disc has \(count). Names will be applied in order.")
                                 .font(.caption).foregroundStyle(.orange)
                         }
                         List(Array(p.titles.enumerated()), id: \.offset) { i, t in
@@ -181,9 +186,9 @@ struct LookupSheet: View {
         .padding(20)
         .frame(width: 720)
         .onAppear {
-            album = disc.album
-            artist = disc.artist
-            if let toc = disc.toc, toc.exact { matchDisc() }
+            album = startAlbum
+            artist = startArtist
+            if let toc = toc, toc.exact { matchDisc() }
         }
         .onChange(of: chosen) { id in loadPreview(id) }
     }
@@ -197,7 +202,7 @@ struct LookupSheet: View {
     }
 
     func matchDisc() {
-        guard let toc = disc.toc else { return }
+        guard let toc = toc else { return }
         message = "Looking for this disc…"
         run {
             let found = try await MusicBrainz.lookup(toc)
@@ -216,27 +221,37 @@ struct LookupSheet: View {
         run {
             let found = try await MusicBrainz.search(album: album, artist: artist)
             // releases with the same number of songs as this disc first
-            results = found.sorted { ($0.trackCount == disc.tracks.count ? 0 : 1) < ($1.trackCount == disc.tracks.count ? 0 : 1) }
+            results = found.sorted { ($0.trackCount == count ? 0 : 1) < ($1.trackCount == count ? 0 : 1) }
             preview = nil; chosen = nil
-            message = found.isEmpty ? "Nothing found. Try fewer or different words." : "\(found.count) result(s). Green ones have \(disc.tracks.count) songs, like your disc."
+            message = found.isEmpty ? "Nothing found. Try fewer or different words." : "\(found.count) result(s). Green ones have \(count) songs, like your disc."
         }
     }
 
     func loadPreview(_ id: String?) {
         guard let id else { preview = nil; return }
         run {
-            let t = try await MusicBrainz.tracks(id, wanted: disc.tracks.count)
+            let t = try await MusicBrainz.tracks(id, wanted: count)
             if chosen == id { preview = t }
         }
     }
 
     func apply() {
         guard let p = preview else { return }
-        disc.album = p.album
-        disc.artist = p.artist
-        for (i, t) in disc.tracks.enumerated() where i < p.titles.count && !p.titles[i].isEmpty {
-            disc.names[t.number] = p.titles[i]
-        }
+        onApply(p)
         dismiss()
+    }
+}
+
+extension LookupSheet {
+    /// Names the songs of an opened disc image or CD.
+    init(disc: Disc) {
+        self.init(heading: disc.url.lastPathComponent, count: disc.tracks.count, toc: disc.toc,
+                  startAlbum: disc.album, startArtist: disc.artist) { p in
+            disc.album = p.album
+            disc.artist = p.artist
+            for (i, t) in disc.tracks.enumerated() where i < p.titles.count && !p.titles[i].isEmpty {
+                disc.names[t.number] = p.titles[i]
+            }
+        }
     }
 }

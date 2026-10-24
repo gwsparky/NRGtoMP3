@@ -1,0 +1,49 @@
+HOW TO UPDATE NRG TO MP3 (on the Mac)
+=====================================
+
+Your project lives in two places:
+  - On GitHub:   https://github.com/gwsparky/NRGtoMP3
+  - On this Mac: Desktop > NrgToMp3
+
+Changes you make on the Windows PC go up to GitHub. The Mac doesn't
+get them until you update it.
+
+
+1. UPDATE THE MAC FROM GITHUB AND BUILD THE MAC APP
+---------------------------------------------------
+Open the Claude app, go to the Code tab, and open the pinned
+conversation "NRG to MP3 – GitHub connection" (top of the left
+sidebar, under Pinned). Then type:
+
+    Update from GitHub and build the Mac version.
+
+When it's finished, the new files are in Desktop > NrgToMp3 > dist:
+  - NRG to MP3 Installer.dmg   (double-click it, then drag the app
+                                into Applications)
+  - NRG to MP3.app             (the app itself)
+
+Check the build number in the app's title to make sure it's the
+new one.
+
+
+2. BACK UP GITHUB TO THIS MAC (whenever you like)
+-------------------------------------------------
+This keeps a copy of everything in case GitHub ever goes down.
+
+  1. Open Finder and click your home folder (the house icon).
+  2. Open the folder "NRGtoMP3 Backup".
+  3. Double-click "Back Up Now.command".
+  4. When the window says "Backup finished", close it.
+
+If the Mac says it can't open the file: right-click it, choose
+Open, then click Open again. (You only need to do this once.)
+
+Inside "NRGtoMP3 Backup":
+  - files     = a normal copy of the project you can look at
+  - repo.git  = the full history (every branch and change)
+
+
+3. IF SOMETHING GOES WRONG
+--------------------------
+Ask Claude in that same pinned conversation, and include the exact
+error message or a screenshot.

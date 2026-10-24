@@ -50,6 +50,20 @@ final class BurnList: NSObject, ObservableObject {
         didSet { UserDefaults.standard.set(defaultGap, forKey: "defaultGap") }
     }
     @Published var discTitle = ""
+    @Published var discArtist = ""
+
+    /// The list's track layout as it would be burned (2 s lead-in, then gaps and songs), for MusicBrainz.
+    /// Marked inexact so MusicBrainz also finds near matches: song lengths from MP3s etc. can be a little off.
+    var toc: TOC? {
+        guard !items.isEmpty else { return nil }
+        var pos = 150, offsets: [Int] = []
+        for (i, item) in items.enumerated() {
+            pos += Int((gap(at: i) * 75).rounded())
+            offsets.append(pos)
+            pos += Int((item.seconds * 75).rounded())
+        }
+        return TOC(exact: false, first: 1, last: items.count, leadout: pos, offsets: offsets)
+    }
     @Published var running = false
     @Published var started: Date?
     @Published var status = ""
@@ -179,6 +193,7 @@ final class BurnList: NSObject, ObservableObject {
         func quoted(_ s: String) -> String { "\"" + s.replacingOccurrences(of: "\"", with: "'") + "\"" }
 
         var cueText = ""
+        if !discArtist.isEmpty { cueText += "PERFORMER \(quoted(discArtist))\n" }
         if !discTitle.isEmpty { cueText += "TITLE \(quoted(discTitle))\n" }
         cueText += "FILE \(quoted(bin.lastPathComponent)) BINARY\n"
         var pos: Int64 = 0      // in 2352-byte sectors
@@ -406,7 +421,7 @@ final class BurnList: NSObject, ObservableObject {
         let temp = FileManager.default.temporaryDirectory.appendingPathComponent("nrgburn-\(UUID().uuidString)")
         try? FileManager.default.createDirectory(at: temp, withIntermediateDirectories: true)
         let gaps = items.indices.map { gap(at: $0) }
-        let titles = items.enumerated().map { numberedName($0.offset + 1, $0.element.title) }, discTitle = discTitle
+        let titles = items.enumerated().map { numberedName($0.offset + 1, $0.element.title) }, discTitle = discTitle, discArtist = discArtist
         DispatchQueue.global().async {
             let wavs: [URL]
             do { wavs = try self.writeWavs(in: temp) { s in DispatchQueue.main.async { self.status = s } } }
@@ -431,8 +446,8 @@ final class BurnList: NSObject, ObservableObject {
                 // song names as CD-Text, if the burner can write it
                 if let dev = burnObj.device(), (dev.info()?[DRDeviceCanWriteCDTextKey] as? Bool) == true,
                    let text = DRCDTextBlock(language: "en", encoding: String.Encoding.isoLatin1.rawValue) {
-                    var dicts: [[String: Any]] = [[DRCDTextTitleKey: discTitle.isEmpty ? "Audio CD" : discTitle]]
-                    dicts += titles.map { [DRCDTextTitleKey: $0] }
+                    var dicts: [[String: Any]] = [[DRCDTextTitleKey: discTitle.isEmpty ? "Audio CD" : discTitle, DRCDTextPerformerKey: discArtist]]
+                    dicts += titles.map { [DRCDTextTitleKey: $0, DRCDTextPerformerKey: discArtist] }
                     text.setTrackDictionaries(dicts)
                     var props = burnObj.properties() ?? [:]
                     props[DRCDTextKey] = text
@@ -456,6 +471,7 @@ struct BurnTab: View {
     @State private var targeted = false
     @State private var selection = Set<UUID>()
     @State private var splitting: BurnItem?
+    @State private var lookingUp = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -471,6 +487,9 @@ struct BurnTab: View {
             HStack {
                 Text("Disc title:").bold()
                 TextField("Optional (saved as CD-Text where supported)", text: $burn.discTitle).disabled(burn.running)
+                Button("Look Up Names…") { lookingUp = true }
+                    .disabled(burn.items.isEmpty || burn.running)
+                    .help("Find the album and song names on MusicBrainz and fill them in")
                 Divider().frame(height: 18)
                 Button { player.playAll(burn.playItems) } label: { Label("Play All", systemImage: "play.fill") }
                     .disabled(burn.items.isEmpty)
@@ -559,6 +578,16 @@ struct BurnTab: View {
         }
         .padding(18)
         .onAppear { burn.checkDrive() }
+        .sheet(isPresented: $lookingUp) {
+            LookupSheet(heading: "Burn list", count: burn.items.count, toc: burn.toc,
+                        startAlbum: burn.discTitle, startArtist: burn.discArtist) { p in
+                if !p.album.isEmpty { burn.discTitle = p.album }
+                burn.discArtist = p.artist
+                for i in burn.items.indices where i < p.titles.count && !p.titles[i].isEmpty {
+                    burn.items[i].title = p.titles[i]
+                }
+            }
+        }
         .sheet(item: $splitting) { item in
             SplitEditor(item: item) { parts in burn.replace(item.id, with: parts) }
         }
