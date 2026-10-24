@@ -1,0 +1,28 @@
+# Song names for Americas 25 Favorite old time gospel songs.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Americas 25 Favorite old time gospel songs
+1. Blessed Be the Name
+2. Glory to His Name
+3. A New Name in Glory
+4. He Lives
+5. What a Friend We Have in Jesus
+6. He Leadeth Me
+7. Sweet Hour of Prayer
+8. Because He Lives
+9. It Is No Secret
+10. 'Tis So Sweet to Trust in Jesus
+11. Since Jesus Came into My Heart
+12. There Is Power in the Blood
+13. I Saw the Light
+14. Victory in Jesus
+15. Count Your Blessings
+16. O, How I Love Jesus
+17. Love Lifted Me
+18. Oh, How He Loves You and Me
+19. The Old Rugged Cross
+20. Beneath the Cross of Jesus
+21. Room at the Cross for You
+22. Something Beautiful
+23. Amazing Grace
+24. He Touched Me
+25. When We All Get to Heaven
