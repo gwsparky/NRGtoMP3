@@ -2,7 +2,7 @@
 # One song per line: a number, then the name. Lines starting with # are ignored.
 Album: Church Music
 Artist: Various
-1. Track 01
+1. I'm Gonna Wear a Crown
 2. Track 02
 3. What a Meeting
 4. Track 04
