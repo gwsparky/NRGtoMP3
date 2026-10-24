@@ -470,7 +470,7 @@ final class BurnList: NSObject, ObservableObject {
                     tracks.append(t)
                 }
                 // song names as CD-Text, if the burner can write it
-                if let dev = burnObj.device(), (dev.info()?[DRDeviceCanWriteCDTextKey] as? Bool) == true,
+                if let dev = burnObj.device(), ((dev.info()?[DRDeviceWriteCapabilitiesKey] as? [String: Any])?[DRDeviceCanWriteCDTextKey] as? Bool) == true,   // it's among the write capabilities, not at the top
                    let text = DRCDTextBlock(language: "en", encoding: String.Encoding.isoLatin1.rawValue) {
                     var dicts: [[String: Any]] = [[DRCDTextTitleKey: discTitle.isEmpty ? "Audio CD" : discTitle, DRCDTextPerformerKey: discArtist]]
                     dicts += titles.map { [DRCDTextTitleKey: $0, DRCDTextPerformerKey: discArtist] }
