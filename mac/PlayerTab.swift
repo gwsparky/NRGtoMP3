@@ -35,7 +35,7 @@ struct PlayerTab: View {
                         Image(systemName: "music.note.list").font(.system(size: 40)).foregroundStyle(.secondary)
                         Text("Drag songs (WAV, MP3, AIFF, M4A) or .nrg / .cue disc images here")
                         Text("or open a saved playlist").font(.caption).foregroundStyle(.secondary)
-                        HStack { Button("Add Files…") { chooseFiles() }; Button("Add Disc Image…") { chooseImage() } }
+                        HStack { Button("Add Files…") { chooseFiles() }; Button("Add Disc Image…") { chooseImage() }; Button("Play CD") { playCD() } }
                     }
                 } else {
                     List(selection: $selection) {
@@ -62,6 +62,8 @@ struct PlayerTab: View {
                 Button("Add Files…") { chooseFiles() }
                 Button("Add Disc Image…") { chooseImage() }
                     .help("Add every song from a .nrg or .cue image")
+                Button("Play CD") { playCD() }
+                    .help("Play the audio CD in the drive, with the song names burned on it")
                 Button("Clear") { player.stop(); list.items.removeAll() }.disabled(list.items.isEmpty)
                 Spacer()
                 Text("\(list.items.count) song(s) · \(timeString(list.items.reduce(0) { $0 + $1.seconds }))").foregroundStyle(.secondary)
@@ -178,6 +180,14 @@ struct PlayerTab: View {
         if ["nrg", "cue"].contains(url.pathExtension.lowercased()) { list.addImage(url) }
         else if url.pathExtension.lowercased() == "nrgplaylist" { load(url) }
         else { list.addFiles([url]) }
+    }
+
+    func playCD() {
+        let cds = AudioCD.inserted()
+        guard let cd = cds.first else { list.status = "No audio CD found. Put one in the drive, wait for it to appear, then try again."; return }
+        let start = list.items.count
+        list.addCD(cd)
+        if list.items.count > start { player.playAll(list.playItems, from: start) }
     }
 
     func chooseFiles() {

@@ -10,3 +10,7 @@ int cd_read_audio(int fd, uint64_t lba, uint32_t sectors, void *buffer);
 
 /// The drive's current read speed in KB/s (176 = 1x), or 0 if unknown.
 int cd_speed(int fd);
+
+/// Reads the disc's CD-Text (raw 18-byte packs, after a 4-byte header) into `buffer`.
+/// Returns the number of bytes, or 0 if the disc has none.
+int cd_text(int fd, void *buffer, uint16_t size);

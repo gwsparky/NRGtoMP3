@@ -162,6 +162,19 @@ final class BurnList: NSObject, ObservableObject {
         status += " Names loaded from " + from.joined(separator: " and ") + "."
     }
 
+    /// Adds every song of an audio CD in the drive, named from the disc's CD-Text.
+    func addCD(_ cd: AudioCD) {
+        addFiles(cd.tracks)
+        let added = items.suffix(cd.tracks.count)
+        for (k, f) in zip(added.indices, cd.tracks) {
+            items[k].title = cd.names[AudioCD.number(f)] ?? String(format: "Track %02d", AudioCD.number(f))
+            items[k].note = "\(cd.volume.lastPathComponent), track \(AudioCD.number(f))"
+        }
+        if discTitle.isEmpty { discTitle = cd.album }
+        if discArtist.isEmpty { discArtist = cd.artist }
+        status = "Added \(cd.tracks.count) songs from the CD" + (cd.names.isEmpty ? " (it has no song names on it)." : ", with the names on the disc.")
+    }
+
     /// Loads every song of a disc image with its original gaps, so the burned CD matches the one it came from.
     func addImage(_ url: URL) {
         guard let tool = Bundle.main.url(forResource: "NrgToMp3", withExtension: nil) else { return }
@@ -507,6 +520,9 @@ struct BurnTab: View {
                     ForEach(gapChoices, id: \.self) { Text(gapLabel($0)).tag($0) }
                 }
                 .labelsHidden().frame(width: 160).disabled(burn.running)
+                Button("Apply to All") { for i in burn.items.indices { burn.items[i].gap = nil } }
+                    .disabled(burn.items.isEmpty || burn.running)
+                    .help("Use this gap before every song, replacing gaps set on single songs or kept from a disc image")
                 Text("Use “None” for songs split from one recording.").font(.caption).foregroundStyle(.secondary)
                 Spacer()
             }

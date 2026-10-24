@@ -197,6 +197,8 @@ final class KeyTabState: ObservableObject {
     @Published var item: BurnItem?
     @Published var choice: ImageChoice?
     @Published var lastChoice: ImageChoice?        // the disc image the current song came from, for "Song List"
+    @Published var cd: AudioCD?                    // an audio CD whose song list is showing
+    @Published var lastCD: AudioCD?                // the CD the current song came from, for "Song List"
     @Published var picked: Set<Int> = []           // songs ticked in the list, to combine
     @Published var loading = false
     @Published var halfSteps = 0 { didSet { updatePlayer() } }
@@ -312,11 +314,26 @@ final class KeyTabState: ObservableObject {
         }
     }
 
+    /// Shows the songs of the audio CD in the drive, named from the disc's CD-Text.
+    func openCD() {
+        guard let found = AudioCD.inserted().first else {
+            close(); status = "No audio CD found. Put one in the drive, wait for it to appear, then try again."; return
+        }
+        close()
+        cd = found
+    }
+
+    func pickCD(_ f: URL, from c: AudioCD) {
+        cd = nil
+        lastCD = c
+        let n = AudioCD.number(f)
+        load(BurnItem(title: c.names[n] ?? String(format: "Track %02d", n), source: .file(f), seconds: 0))
+    }
+
     /// Back to the disc's song list, keeping the key settings for the next song.
     func backToList() {
-        guard let c = lastChoice else { return }
-        unloadSong()
-        choice = c
+        if let c = lastChoice { unloadSong(); choice = c }
+        else if let c = lastCD { unloadSong(); cd = c }
     }
 
     /// Joins the ticked songs into one, then opens it. Songs next to each other on the disc keep the
@@ -374,7 +391,7 @@ final class KeyTabState: ObservableObject {
     }
 
     func close() {
-        lastChoice = nil; picked = []
+        lastChoice = nil; picked = []; cd = nil; lastCD = nil
         player.stop()
         item = nil; choice = nil; pcm = Data(); buffer = nil; sourcePCM = Data(); sourceBuffer = nil
         peaks = ([], []); sourcePeaks = ([], [])
@@ -469,12 +486,14 @@ struct KeyTab: View {
                 }
                 Spacer()
                 Button("Open Song…") { chooseSong() }.disabled(state.running)
-                if state.item != nil && state.lastChoice != nil {
+                Button("Open CD") { state.openCD() }.disabled(state.running)
+                    .help("Choose a song from the audio CD in the drive")
+                if state.item != nil && (state.lastChoice != nil || state.lastCD != nil) {
                     Button { state.backToList() } label: { Label("Song List", systemImage: "chevron.left") }
                         .disabled(state.running)
-                        .help("Back to the list of songs on \(state.lastChoice?.url.lastPathComponent ?? "the disc")")
+                        .help("Back to the list of songs on \(state.lastChoice?.url.lastPathComponent ?? state.lastCD?.volume.lastPathComponent ?? "the disc")")
                 }
-                if state.item != nil || state.choice != nil { Button("Close") { state.close() }.disabled(state.running) }
+                if state.item != nil || state.choice != nil || state.cd != nil { Button("Close") { state.close() }.disabled(state.running) }
             }
 
             if state.item != nil {
@@ -483,6 +502,8 @@ struct KeyTab: View {
                 outputControls
             } else if let c = state.choice {
                 trackPicker(c)
+            } else if let c = state.cd {
+                cdPicker(c)
             } else if state.loading {
                 HStack { ProgressView().controlSize(.small); Text(state.status) }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -546,7 +567,7 @@ struct KeyTab: View {
                 Image(systemName: "music.quarternote.3").font(.system(size: 40)).foregroundStyle(.secondary)
                 Text("Drag a song here (WAV, MP3, AIFF, M4A)")
                 Text("or a .nrg / .cue disc image, then pick the song").font(.caption).foregroundStyle(.secondary)
-                Button("Open Song…") { chooseSong() }
+                HStack { Button("Open Song…") { chooseSong() }; Button("Open CD") { state.openCD() } }
             }
         }
         .frame(maxHeight: .infinity)
@@ -586,6 +607,22 @@ struct KeyTab: View {
                     .disabled(n < 2)
                     .help("Join the ticked songs into one song (neighbouring songs keep their original gap)")
             }
+        }
+    }
+
+    func cdPicker(_ c: AudioCD) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text((c.album.isEmpty ? "Songs on the CD" : "Songs on \(c.album)") + ": choose one.").font(.callout)
+            List(c.tracks, id: \.self) { f in
+                let n = AudioCD.number(f)
+                HStack {
+                    Text(String(format: "%02d", n)).monospacedDigit().foregroundStyle(.secondary)
+                    Text(c.names[n] ?? "Track \(n)")
+                    Spacer()
+                    Button("Choose") { state.pickCD(f, from: c) }
+                }
+            }
+            if c.names.isEmpty { Text("This CD has no song names on it.").font(.caption).foregroundStyle(.secondary) }
         }
     }
 
