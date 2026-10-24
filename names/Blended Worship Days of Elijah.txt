@@ -1,0 +1,11 @@
+# Song names for Blended Worship Days of Elijah.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Blended Worship Days of Elijah
+1. Mighty to Save
+2. How Great Thou Art
+3. Revelation Song
+4. Oh Praise Him
+5. Made Me Glad
+6. Amazing Grace
+7. Track 07
+8. Days of Elijah
