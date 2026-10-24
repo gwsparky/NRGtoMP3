@@ -1,0 +1,85 @@
+# Song names for Arise My Love Accompaniment CD.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Arise My Love Accompaniment CD
+1. Crown Him Medley Split Track  01
+2. Crown Him Medley Split Track  02
+3. Crown Him Medley Split Track  03
+4. Crown Him Medley Split Track  04
+5. Crown Him Medley Split Track  05
+6. Crown Him Medley Split Track  06
+7. Crown Him Medley Split Track  07
+8. He Touched Me Split Track  08
+9. He Touched Me Split Track  09
+10. He Touched Me Split Track  10
+11. He Touched Me Split Track  11
+12. He Touched Me Split Track  12
+13. He Touched Me Split Track  13
+14. He Touched Me Split Track  14
+15. In the Name of the Lord Split Track  15
+16. In the Name of the Lord Split Track  16
+17. In the Name of the Lord Split Track  17
+18. In the Name of the Lord Split Track  18
+19. Mount Calvary Medley Split Track  19
+20. Mount Calvary Medley Split Track  20
+21. Mount Calvary Medley Split Track  21
+22. Mount Calvary Medley Split Track  22
+23. Mount Calvary Medley Split Track  23
+24. Mount Calvary Medley Split Track  24
+25. Mount Calvary Medley Split Track  25
+26. Mount Calvary Medley Split Track  26
+27. Arise, My Love Split Track  27
+28. Arise, My Love Split Track  28
+29. Arise, My Love Split Track  29
+30. Arise, My Love Split Track  30
+31. Arise, My Love Split Track  31
+32. Arise, My Love Split Track  32
+33. Arise, My Love Split Track  33
+34. Arise, My Love Split Track  34
+35. Coronation Medley Split Track  35
+36. Coronation Medley Split Track  36
+37. Coronation Medley Split Track  37
+38. Coronation Medley Split Track  38
+39. Coronation Medley Split Track  39
+40. Coronation Medley Split Track  40
+41. Coronation Medley Split Track  41
+42. Crown Him Medley Stereo  42
+43. Crown Him Medley Stereo  43
+44. Crown Him Medley Stereo  44
+45. Crown Him Medley Stereo  45
+46. Crown Him Medley Stereo  46
+47. Crown Him Medley Stereo  47
+48. Crown Him Medley Stereo  48
+49. Crown Him Medley Stereo  49
+50. He Touched Me Stereo  50
+51. He Touched Me Stereo  51
+52. He Touched Me Stereo  52
+53. He Touched Me Stereo  53
+54. He Touched Me Stereo  54
+55. He Touched Me Stereo  55
+56. In the Name of the Lord Stereo  56
+57. In the Name of the Lord Stereo  57
+58. In the Name of the Lord Stereo  58
+59. In the Name of the Lord Stereo  59
+60. Mount Calvary Medley Stereo  60
+61. Mount Calvary Medley Stereo  61
+62. Mount Calvary Medley Stereo  62
+63. Mount Calvary Medley Stereo  63
+64. Mount Calvary Medley Stereo  64
+65. Mount Calvary Medley Stereo  65
+66. Mount Calvary Medley Stereo  66
+67. Mount Calvary Medley Stereo  67
+68. Arise, My Love Stereo  68
+69. Arise, My Love Stereo  69
+70. Arise, My Love Stereo  70
+71. Arise, My Love Stereo  71
+72. Arise, My Love Stereo  72
+73. Arise, My Love Stereo  73
+74. Arise, My Love Stereo  74
+75. Arise, My Love Stereo  75
+76. Coronation Medley Stereo  76
+77. Coronation Medley Stereo  77
+78. Coronation Medley Stereo  78
+79. Coronation Medley Stereo  79
+80. Coronation Medley Stereo  80
+81. Coronation Medley Stereo  81
+82. Coronation Medley Stereo  82
