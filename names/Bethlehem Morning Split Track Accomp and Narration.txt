@@ -1,0 +1,92 @@
+# Song names for Bethlehem Morning Split Track Accomp and Narration.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Bethlehem Morning Split Track Accomp and Narration
+1. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  01
+2. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  02
+3. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  03
+4. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  04
+5. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  05
+6. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  06
+7. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  07
+8. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  08
+9. Joy in Bethlehem! Medley (includes Bethlehem Morning / Joy to the World!)  09
+10. Children, Go Where I Send Thee  10
+11. Children, Go Where I Send Thee  11
+12. Children, Go Where I Send Thee  12
+13. Children, Go Where I Send Thee  13
+14. Children, Go Where I Send Thee  14
+15. Children, Go Where I Send Thee  15
+16. Children, Go Where I Send Thee  16
+17. Children, Go Where I Send Thee  17
+18. Children, Go Where I Send Thee  18
+19. Children, Go Where I Send Thee  19
+20. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  20
+21. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  21
+22. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  22
+23. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  23
+24. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  24
+25. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  25
+26. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  26
+27. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  27
+28. Bethlehem Manger Medley (includes O Little Town of Bethlehem / I Come to the Manger)  28
+29. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  29
+30. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  30
+31. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  31
+32. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  32
+33. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  33
+34. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  34
+35. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  35
+36. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  36
+37. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  37
+38. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  38
+39. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  39
+40. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  40
+41. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  41
+42. Come, Let Us Worship Medley (includes O Come, All Ye Faithful / Here I Am to Worship)  42
+43. Bethlehem Morning  43
+44. Bethlehem Morning  44
+45. Bethlehem Morning  45
+46. Bethlehem Morning  46
+47. Bethlehem Morning  47
+48. Bethlehem Morning  48
+49. Bethlehem Morning  49
+50. Bethlehem Morning  50
+51. Bethlehem Morning  51
+52. Bethlehem Morning  52
+53. Bethlehem Morning  53
+54. Bethlehem Morning  54
+55. Bethlehem Morning  55
+56. This Must Be the Place / We Are the Reason  56
+57. This Must Be the Place / We Are the Reason  57
+58. This Must Be the Place / We Are the Reason  58
+59. This Must Be the Place / We Are the Reason  59
+60. This Must Be the Place / We Are the Reason  60
+61. This Must Be the Place / We Are the Reason  61
+62. This Must Be the Place / We Are the Reason  62
+63. This Must Be the Place / We Are the Reason  63
+64. This Must Be the Place / We Are the Reason  64
+65. This Must Be the Place / We Are the Reason  65
+66. This Must Be the Place / We Are the Reason  66
+67. This Must Be the Place / We Are the Reason  67
+68. This Must Be the Place / We Are the Reason  68
+69. This Must Be the Place / We Are the Reason  69
+70. The Reason for Joy! Finale  70
+71. The Reason for Joy! Finale  71
+72. The Reason for Joy! Finale  72
+73. The Reason for Joy! Finale  73
+74. The Reason for Joy! Finale  74
+75. The Reason for Joy! Finale  75
+76. The Reason for Joy! Finale  76
+77. The Reason for Joy! Finale  77
+78. The Reason for Joy! Finale  78
+79. The Reason for Joy! Finale  79
+80. The Reason for Joy! Finale  80
+81. The Reason for Joy! Finale  81
+82. The Reason for Joy! Finale  82
+83. Joy in Bethlehem! Medley Performance  83
+84. Children, Go Where I Send TheePerformance  84
+85. Bethlehem Manger MedleyPerformance  85
+86. Come, Let Us Worship Medley Performance  86
+87. Bethlehem Morning Performance  87
+88. This Must Be the Place / We Are the Reason Performance  88
+89. The Reason for Joy! Finale Performance  89
