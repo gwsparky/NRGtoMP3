@@ -1,0 +1,28 @@
+# Song names for Americas 25 Fav Praise and Worship Choruses.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Americas 25 Fav Praise and Worship Chourses
+1. Majesty
+2. I Love You, Lord
+3. Give Thanks
+4. Glorify Thy Name
+5. I Will Call Upon The Lord
+6. All Hail King Jesus
+7. Emmanuel
+8. His Name Is Wonderful
+9. Track 09
+10. Track 10
+11. Track 11
+12. Track 12
+13. Track 13
+14. Track 14
+15. Track 15
+16. Track 16
+17. Track 17
+18. Track 18
+19. Track 19
+20. Track 20
+21. Track 21
+22. Track 22
+23. Track 23
+24. Track 24
+25. Track 25
