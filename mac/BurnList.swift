@@ -136,6 +136,32 @@ final class BurnList: NSObject, ObservableObject {
         }
     }
 
+    /// Names for songs just added from a disc image: its names file on this Mac (<image>.txt), then the one on
+    /// GitHub (names/<image>.txt) if syncing is on, the same as when the image is opened on the Convert tab.
+    @MainActor
+    func loadNames(for image: URL, tracks: [TrackInfo], items ids: [UUID]) async {
+        let d = Disc(url: image)
+        d.tracks = tracks
+        var from: [String] = []
+        if let text = (try? String(contentsOf: d.namesFile, encoding: .utf8)) ?? (try? String(contentsOf: d.namesFile, encoding: .isoLatin1)),
+           d.applyNames(text) > 0 { from.append(d.namesFile.lastPathComponent) }
+        if NamesSync.on {
+            do {
+                if let remote = try await NamesSync.download(image), d.applyNames(remote.text) > 0 { from.append("GitHub") }
+            } catch {
+                log += "GitHub names for \(image.lastPathComponent): \(NamesSync.describe(error))\n"
+            }
+        }
+        guard !from.isEmpty else { return }
+        for (id, t) in zip(ids, tracks) {
+            if let k = items.firstIndex(where: { $0.id == id }) { items[k].title = d.name(t) }
+        }
+        let onlyThisImage = items.count == ids.count     // then its names file decides the disc's title and artist
+        if !d.album.isEmpty && (discTitle.isEmpty || onlyThisImage) { discTitle = d.album }
+        if !d.artist.isEmpty && (discArtist.isEmpty || onlyThisImage) { discArtist = d.artist }
+        status += " Names loaded from " + from.joined(separator: " and ") + "."
+    }
+
     /// Loads every song of a disc image with its original gaps, so the burned CD matches the one it came from.
     func addImage(_ url: URL) {
         guard let tool = Bundle.main.url(forResource: "NrgToMp3", withExtension: nil) else { return }
@@ -157,13 +183,13 @@ final class BurnList: NSObject, ObservableObject {
                     return
                 }
                 let audio = URL(fileURLWithPath: r.dataPath ?? url.path)
-                for t in tracks {
-                    self.items.append(BurnItem(title: t.title, source: .nrg(audio, t, swap: r.swap ?? false),
-                                               seconds: t.seconds, gap: t.gap ?? 0))
-                }
+                let added = tracks.map { BurnItem(title: $0.title, source: .nrg(audio, $0, swap: r.swap ?? false),
+                                                  seconds: $0.seconds, gap: $0.gap ?? 0) }
+                self.items += added
                 if self.discTitle.isEmpty { self.discTitle = r.album ?? "" }
                 self.status = "Added \(tracks.count) songs from \(url.lastPathComponent) with their original gaps."
                     + (r.note != nil ? " (Song breaks in this file were guessed from silences.)" : "")
+                Task { await self.loadNames(for: url, tracks: tracks, items: added.map(\.id)) }
             }
         }
     }
