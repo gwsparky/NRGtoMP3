@@ -1,18 +1,18 @@
 # Song names for Bow the Knee.nrg
 # One song per line: a number, then the name. Lines starting with # are ignored.
 Album: Bow the Knee
-1. Track 01
-2. Track 02
-3. Track 03
-4. Track 04
-5. Track 05
-6. Track 06
-7. Track 07
-8. Track 08
+1. We The Redeemed Peformance
+2. We The Redeemed Measure 1
+3. We The Redeemed Measure 2
+4. We The Redeemed Measure 3
+5. We The Redeemed Measure 4
+6. We The Redeemed Measure 5
+7. We The Redeemed Measure 6
+8. We The Redeemed Stereo
 9. Bow The Knee
-10. Track 10
-11. Track 11
-12. Track 12
-13. Track 13
-14. Track 14
-15. Track 15
+10. Bow The Knee Measure 1
+11. Bow The Knee Measure 2
+12. Bow The Knee Measure 3
+13. Bow The Knee Measure 4
+14. Bow The Knee Measure 5
+15. Bow The Knee Stereo
