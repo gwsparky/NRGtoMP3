@@ -17,7 +17,7 @@ be created from a cloud session.
 |---|---|---|
 | `Nrg.cs`, `Program.cs`, `Wav.cs`, `Id3.cs` | **Shared converter**: reads `.nrg` (DAO/TAO, NER5/NERO footers, CD-Text), `.cue/.bin`, and "raw" images with no Nero track list (songs split at ≥5 s silences); exports MP3/WAV with ID3/INFO tags; `--merge`, `--list` (JSON), `--tracks`, `--meta names.json`. The Mac app runs it as a CLI; the Windows app calls `Program.Unpack` directly. | both |
 | `NrgToMp3.csproj` | builds the shared converter as the Mac CLI (`net8.0`, excludes `windows/**`) | Mac |
-| `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key) | Mac |
+| `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key, Waveform Viewer; Player and Change Key also play audio CDs with their CD-Text names via `AudioCD.swift`) | Mac |
 | `build-app.sh` | Mac build: app + `dist/NRG to MP3 Installer.dmg` | Mac |
 | `windows/*.cs`, `windows/NrgToMp3Win.csproj` | WinForms Windows app (`net8.0-windows`, includes the shared files above) | Windows |
 | `windows/build-windows.sh` | builds both Windows `.exe`s **from the Mac** (zsh); on Windows use the commands below | Mac |
@@ -25,7 +25,7 @@ be created from a cloud session.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **20**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **27**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).

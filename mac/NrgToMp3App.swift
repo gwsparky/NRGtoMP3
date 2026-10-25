@@ -420,6 +420,7 @@ struct RootView: View {
     @StateObject private var copier = CDCopier()
     @StateObject private var splitter = SplitTabState()
     @StateObject private var keyChanger = KeyTabState()
+    @StateObject private var waves = WaveTabState()
     @StateObject private var playlist = BurnList()   // the Player tab's songs (same model as the burn list, so playlists work in both)
     @State private var tab = 0
     @AppStorage("backgroundColor") private var backgroundHex = ""
@@ -440,6 +441,8 @@ struct RootView: View {
                     .tabItem { Label("Split Song", systemImage: "scissors") }.tag(3)
                 KeyTab(state: keyChanger, burn: burn, preview: player) { tab = 1 }
                     .tabItem { Label("Change Key", systemImage: "music.quarternote.3") }.tag(4)
+                WaveTab(state: waves, player: player) { url in c.add([url]); tab = 0 }
+                    .tabItem { Label("Waveform Viewer", systemImage: "waveform") }.tag(6)
                 CopyTab(copier: copier, player: player) { cue in c.add([cue]); tab = 0 }
                     .tabItem { Label("Copy CD", systemImage: "square.and.arrow.down.on.square") }.tag(2)
             }
@@ -573,7 +576,7 @@ struct ConvertTab: View {
                     player.stop()
                     if c.merge { namingMerge = true } else { c.convert() }   // merging: confirm the file name(s) first
                 }
-                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)   // no Return shortcut: George pressed Return while renaming and exported by accident
                     .disabled(c.selectedCount == 0 || c.running)
             }
 
