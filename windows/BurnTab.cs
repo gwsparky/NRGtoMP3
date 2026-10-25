@@ -62,6 +62,8 @@ namespace NrgToMp3Win
             playAll.Click += (_, _) => PlayFrom(0);
             var stop = new Button { Text = "■ Stop", AutoSize = true };
             stop.Click += (_, _) => player.Stop();
+            var lookUp = new Button { Text = "Look Up Names…", AutoSize = true };
+            lookUp.Click += (_, _) => LookUp();
             var openList = new Button { Text = "Open Playlist…", AutoSize = true };
             openList.Click += (_, _) => OpenPlaylist();
             var saveList = new Button { Text = "Save Playlist…", AutoSize = true };
@@ -80,11 +82,12 @@ namespace NrgToMp3Win
             };
             top.Controls.AddRange(new Control[] { Bold("Gap between songs:"), defaultGap, applyAll, gapHint });
             top.SetFlowBreak(gapHint, true);
-            top.Controls.AddRange(new Control[] { Bold("Disc title:"), discTitle, playAll, stop, openList, saveList });
+            top.Controls.AddRange(new Control[] { Bold("Disc title:"), discTitle, lookUp, playAll, stop, openList, saveList });
             var tips = new ToolTip();
             tips.SetToolTip(applyAll, "Give every song this gap, replacing any gaps set song by song (including a disc image's original gaps)");
             tips.SetToolTip(discTitle, "The disc's name; also the name of a saved disc image");
             tips.SetToolTip(playAll, "Listen to the list in order");
+            tips.SetToolTip(lookUp, "Find the album and song names on MusicBrainz and fill them in");
             tips.SetToolTip(saveList, "Save this list (songs, order, names and gaps) to open again later, here or on the Mac");
 
             // ---- the list
@@ -135,7 +138,7 @@ namespace NrgToMp3Win
             statusRow.Controls.AddRange(new Control[] { busy, status });
 
             Controls.Add(listPanel); Controls.Add(top); Controls.Add(capRow); Controls.Add(buttons); Controls.Add(burnRow); Controls.Add(statusRow);
-            lockWhileRunning.AddRange(new Control[] { defaultGap, applyAll, discTitle, openList, saveList, addFiles, addImage, clear, refresh, drives, grid });
+            lockWhileRunning.AddRange(new Control[] { defaultGap, applyAll, discTitle, lookUp, openList, saveList, addFiles, addImage, clear, refresh, drives, grid });
 
             burn.Changed += () => { if (IsHandleCreated) BeginInvoke(Rebuild); };
             player.Changed += () => { if (IsHandleCreated) BeginInvoke(UpdatePlayButtons); };
@@ -302,13 +305,27 @@ namespace NrgToMp3Win
                 {
                     status.Text = $"Reading {Path.GetFileName(p)}…";
                     var d = new DiscItem { Path = p };
-                    Task.Run(d.Load).ContinueWith(_ => BeginInvoke(() =>
+                    Task.Run(async () =>
+                    {
+                        d.Load();      // also reads the names file next to the image
+                        // names on GitHub (names/<image>.txt) win, the same as on the Convert tab
+                        if (d.Error == null && SyncSettings.On)
+                            try
+                            {
+                                if (await NamesSync.Download(SyncSettings.Repo, SyncSettings.Token, p) is { } remote && d.ApplyNames(remote.Text) > 0)
+                                    return " Names loaded from GitHub.";
+                            }
+                            catch (Exception ex) { return $" (Couldn't get names from GitHub: {ex.Message})"; }
+                        return d.NamesNote != null ? " Names loaded from " + Path.GetFileName(d.NamesFile) + "." : "";
+                    }).ContinueWith(t => BeginInvoke(() =>
                     {
                         if (d.Error != null) { status.Text = $"Couldn't read {Path.GetFileName(p)}: {d.Error}"; return; }
-                        if (burn.DiscTitle == "") burn.DiscTitle = d.Album;
+                        bool onlyThis = burn.Items.Count == 0;    // then this image's names decide the disc's title and artist
+                        if (burn.DiscTitle == "" || onlyThis) burn.DiscTitle = d.Album;
+                        if (burn.DiscArtist == "" || onlyThis) burn.DiscArtist = d.Artist;
                         burn.Add(BurnList.FromImage(d));
                         status.Text = $"Added {d.Songs.Count} songs from {Path.GetFileName(p)} with their original gaps."
-                            + (d.Nrg.IsRawAudio ? " (Song breaks in this file were guessed from silences.)" : "");
+                            + (d.Nrg.IsRawAudio ? " (Song breaks in this file were guessed from silences.)" : "") + t.Result;
                     }));
                 }
                 else if (SongFiles.AudioExtensions.Contains(ext))
@@ -318,6 +335,20 @@ namespace NrgToMp3Win
                         .Select(f => new BurnItem { Title = Path.GetFileNameWithoutExtension(f), File = f, Seconds = SecondsOf(f) }));
             }
             if (added.Count > 0) burn.Add(added);
+        }
+
+        void LookUp()
+        {
+            if (grid.IsCurrentCellInEditMode) grid.EndEdit();
+            if (burn.Items.Count == 0) { status.Text = "Add songs first, then look up their names."; return; }
+            using var f = new LookupForm("Burn list", burn.Items.Count, burn.Toc(), burn.DiscTitle, burn.DiscArtist, (album, artist, titles) =>
+            {
+                if (album != "") burn.DiscTitle = album;
+                burn.DiscArtist = artist;
+                for (int i = 0; i < burn.Items.Count && i < titles.Count; i++)
+                    if (titles[i] != "") burn.Items[i].Title = titles[i];
+            });
+            if (f.ShowDialog(this) == DialogResult.OK) { burn.NotifyChanged(); status.Text = "Names filled in from MusicBrainz."; }
         }
 
         void SavePlaylist()

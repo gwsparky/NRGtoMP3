@@ -20,6 +20,7 @@ namespace NrgToMp3Win
         public PlaylistTrack Track;
         public bool Swap;
         public byte[] Pcm;                  // or CD audio held in memory
+        public Func<byte[]> Loader;         // or read some other way (a song on a CD in the drive)
 
         public string Source => Note ?? (File != null ? Path.GetFileName(File) : Image != null ? $"{Path.GetFileName(Image)}, track {Track.number}" : "Made in this app");
 
@@ -27,6 +28,7 @@ namespace NrgToMp3Win
         public byte[] Load(Func<string, byte[]> decode)
         {
             if (Pcm != null) return Pcm;
+            if (Loader != null) return Loader();
             if (File != null) return decode(File);
             var t = new Nrg.Track { Number = Track.number, SectorSize = Track.sectorSize, Mode = 7, Start = Track.start, End = Track.start + Track.sectors * Track.sectorSize };
             return Audio.ReadSong(Image, t, Swap);
@@ -34,7 +36,7 @@ namespace NrgToMp3Win
 
         public static BurnItem FromPlayer(PlayerSong s) => new()
         {
-            Title = s.Title, Note = s.Note, Seconds = s.Seconds, Gap = s.Gap, File = s.File, Image = s.Image, Track = s.Track, Swap = s.Swap,
+            Title = s.Title, Note = s.Note, Seconds = s.Seconds, Gap = s.Gap, File = s.File, Image = s.Image, Track = s.Track, Swap = s.Swap, Loader = s.Loader,
         };
     }
 
@@ -48,7 +50,23 @@ namespace NrgToMp3Win
         public const int Sector = 2352;
 
         public readonly List<BurnItem> Items = new();
-        public string DiscTitle = "";
+        public string DiscTitle = "", DiscArtist = "";
+
+        /// <summary>The list's track layout as it would be burned, for MusicBrainz. Marked inexact so near matches are
+        /// found too: song lengths from MP3s etc. can be a little off.</summary>
+        public Toc Toc()
+        {
+            if (Items.Count == 0) return null;
+            int pos = 150;
+            var offsets = new List<int>();
+            for (int i = 0; i < Items.Count; i++)
+            {
+                pos += (int)Sectors(GapAt(i));
+                offsets.Add(pos);
+                pos += (int)Sectors(Items[i].Seconds);
+            }
+            return new Toc(false, 1, Items.Count, pos, offsets.ToArray());
+        }
         public double DefaultGap = double.TryParse(Settings.Get("defaultGap", "2"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var g) ? g : 2;
         public event Action Changed;
 
@@ -119,6 +137,7 @@ namespace NrgToMp3Win
         {
             string bin = Path.ChangeExtension(cue, ".bin");
             var text = new StringBuilder();
+            if (DiscArtist != "") text.Append($"PERFORMER {Quoted(DiscArtist)}\r\n");
             if (DiscTitle != "") text.Append($"TITLE {Quoted(DiscTitle)}\r\n");
             text.Append($"FILE {Quoted(Path.GetFileName(bin))} BINARY\r\n");
             long pos = 0;    // in sectors
@@ -171,11 +190,11 @@ namespace NrgToMp3Win
             {
                 var it = Items[i];
                 var s = new PlayerSong { Title = it.Title, Note = it.Note, Gap = it.Gap, Seconds = it.Seconds, File = it.File, Image = it.Image, Track = it.Track, Swap = it.Swap };
-                if (it.Pcm != null)
+                if (it.Pcm != null || it.Loader != null)
                 {
                     Directory.CreateDirectory(filesDir);
                     string wav = Path.Combine(filesDir, $"{i + 1:00} - {Program.Clean(it.Title)}.wav");
-                    WriteWav(wav, it.Pcm);
+                    WriteWav(wav, it.Pcm ?? it.Loader());
                     s.File = wav;
                     written++;
                 }

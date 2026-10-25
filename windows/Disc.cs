@@ -21,6 +21,49 @@ namespace NrgToMp3Win
         public Dictionary<int, string> Names = new();     // song names, edited or looked up
         public HashSet<int> Selected = new();
         public string NamesNote;                           // e.g. "Names loaded from Church Music.txt"
+        public CdReader Cd;                                // set when this is an audio CD in a drive, not an image file
+        readonly List<(int number, byte[] pcm)> cdCache = new();   // the last few songs read from the CD (reading one takes a while)
+
+        public bool IsCd => Cd != null;
+
+        /// <summary>A song's audio as CD PCM, from the image file or straight from the CD.</summary>
+        public byte[] ReadTrack(Nrg.Track t)
+        {
+            if (Cd == null) return Audio.ReadSong(Nrg.DataPath, t, Swap);
+            bool whole = Songs.Contains(t);
+            lock (cdCache)
+                if (whole && cdCache.Find(c => c.number == t.Number).pcm is byte[] hit) return hit;
+            var pcm = Cd.ReadSong(new CdReader.Song(t.Number, t.Start / 2352, t.Sectors));
+            if (whole)
+                lock (cdCache)
+                {
+                    cdCache.RemoveAll(c => c.number == t.Number);
+                    cdCache.Add((t.Number, pcm));
+                    if (cdCache.Count > 3) cdCache.RemoveAt(0);
+                }
+            return pcm;
+        }
+
+        /// <summary>The audio CD in a drive, named from its CD-Text. Its names file is named after the album on the disc
+        /// ("Church Music.txt"), so the names on GitHub for the image of the same CD are found too. Slow: call in the background.</summary>
+        public static DiscItem FromCd(string letter)
+        {
+            var cd = new CdReader(letter);
+            if (cd.Songs.Count == 0) { cd.Dispose(); throw new InvalidDataException($"The disc in {letter} has no music tracks."); }
+            var (album, artist, names) = cd.ReadCdText();
+            var d = new DiscItem
+            {
+                Cd = cd, Album = album, Artist = artist, Toc = cd.Toc,
+                Path = System.IO.Path.Combine(letter + "\\", (Program.Clean(album) is { Length: > 0 } a ? a : "Audio CD") + ".cue"),
+                Songs = cd.Songs.Select(s => new Nrg.Track { Number = s.Number, SectorSize = 2352, Mode = 7, Start = s.Lba * 2352, End = (s.Lba + s.Sectors) * 2352,
+                                                            Title = names.GetValueOrDefault(s.Number) }).ToList(),
+            };
+            d.Names = d.Songs.ToDictionary(t => t.Number, t => t.Title ?? $"Track {t.Number:00}");
+            d.Selected = d.Songs.Select(t => t.Number).ToHashSet();
+            d.Note = names.Count == 0 ? "This CD has no song names on it." : null;
+            d.Loading = false;
+            return d;
+        }
 
         /// <summary>The names file next to the image: "Church Music.nrg" → "Church Music.txt".</summary>
         public string NamesFile => System.IO.Path.ChangeExtension(Path, ".txt");
@@ -155,7 +198,7 @@ namespace NrgToMp3Win
                 bool neighbour = i + 1 < chosen.Count && at + 1 < d.Songs.Count && d.Songs[at + 1] == chosen[i + 1];
                 // run on to where the next song starts, keeping the gap between them
                 var piece = new Nrg.Track { Number = t.Number, SectorSize = t.SectorSize, Mode = t.Mode, Start = t.Start, End = neighbour ? chosen[i + 1].Start : t.End };
-                var pcm = ReadSong(d.Nrg.DataPath, piece, d.Swap);
+                var pcm = d.ReadTrack(piece);
                 ms.Write(pcm, 0, pcm.Length);
             }
             return ms.ToArray();

@@ -14,6 +14,7 @@ namespace NrgToMp3Win
     {
         public record Song(int Number, long Lba, long Sectors);
 
+        const uint IOCTL_CDROM_READ_TOC_EX = 0x00024054;
         const uint IOCTL_CDROM_READ_TOC = 0x00024000, IOCTL_CDROM_RAW_READ = 0x0002403E, IOCTL_STORAGE_EJECT_MEDIA = 0x002D4808;
         const int Sector = 2352, Chunk = 20;          // sectors per read; drives accept at least this many
 
@@ -65,6 +66,23 @@ namespace NrgToMp3Win
             }
         }
 
+        /// <summary>The album, artist and song names burned on the disc (CD-Text), if it has any.</summary>
+        public (string album, string artist, Dictionary<int, string> names) ReadCdText()
+        {
+            var input = new byte[4] { 5 /* CDROM_READ_TOC_EX_FORMAT_CDTEXT */, 0, 0, 0 };
+            var output = new byte[32768];
+            int length;
+            lock (this)
+                if (!DeviceIoControl(handle, IOCTL_CDROM_READ_TOC_EX, input, input.Length, output, output.Length, out int got, IntPtr.Zero) || got < 22)
+                    return ("", "", new());
+                else length = Math.Min(got, (output[0] << 8 | output[1]) + 2);
+            var titles = CdText.Strings(output, length, 0x80);
+            var performers = CdText.Strings(output, length, 0x81);
+            var names = new Dictionary<int, string>();
+            foreach (var (n, t) in titles) if (n > 0 && t != "") names[n] = t;
+            return (titles.GetValueOrDefault(0, ""), performers.GetValueOrDefault(0, ""), names);
+        }
+
         /// <summary>The music's layout in MusicBrainz terms (first song at 150; a data track at the end is left out, as MusicBrainz does).</summary>
         public Toc Toc => Songs.Count == 0 ? null
             : new(true, Songs[0].Number, Songs[^1].Number, (int)(Songs[^1].Lba + Songs[^1].Sectors) + 150, Songs.Select(s => (int)s.Lba + 150).ToArray());
@@ -87,6 +105,11 @@ namespace NrgToMp3Win
         }
 
         bool TryRead(long lba, int count, byte[] buffer, int offset)
+        {
+            lock (this) return TryReadLocked(lba, count, buffer, offset);
+        }
+
+        bool TryReadLocked(long lba, int count, byte[] buffer, int offset)
         {
             var info = new byte[16];
             BitConverter.GetBytes(lba * 2048).CopyTo(info, 0);       // the drive wants a "cooked" byte offset

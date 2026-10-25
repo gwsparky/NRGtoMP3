@@ -101,6 +101,9 @@ namespace NrgToMp3Win
             var addFiles = new Button { Text = "Add Files…", AutoSize = true };
             var addImage = new Button { Text = "Add Disc Image…", AutoSize = true };
             var clear = new Button { Text = "Clear", AutoSize = true };
+            var playCd = new Button { Text = "Play CD", AutoSize = true };
+            playCd.Click += (_, _) => PlayCd();
+            new ToolTip().SetToolTip(playCd, "Play the music CD in the drive, with the song names burned on it");
             var toBurn = new Button { Text = "Send to Burn List", AutoSize = true };
             toBurn.Click += (_, _) =>
             {
@@ -115,7 +118,7 @@ namespace NrgToMp3Win
             addImage.Click += (_, _) => { using var d = new OpenFileDialog { Multiselect = true, Filter = "Disc images (*.nrg;*.cue)|*.nrg;*.cue" }; if (d.ShowDialog(this) == DialogResult.OK) Add(d.FileNames); };
             clear.Click += (_, _) => { player.Stop(); songs.Clear(); Rebuild(); };
             var bottom = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            bottom.Controls.AddRange(new Control[] { addFiles, addImage, clear, toBurn, summary });
+            bottom.Controls.AddRange(new Control[] { addFiles, addImage, playCd, clear, toBurn, summary });
             var hint = new Label { Dock = DockStyle.Bottom, AutoSize = true, ForeColor = SystemColors.GrayText, Text = "Drag songs (WAV, MP3, M4A, …), .nrg / .cue disc images or saved playlists onto this tab. Double-click a song to play from there." };
 
             Controls.Add(grid); Controls.Add(listHeader); Controls.Add(nowPanel); Controls.Add(hint); Controls.Add(bottom); Controls.Add(status);
@@ -134,7 +137,7 @@ namespace NrgToMp3Win
 
         /// <summary>The playlist as player items, starting the queue from any song.</summary>
         List<PreviewPlayer.Item> Items() => songs.Select(s => new PreviewPlayer.Item(s.Id.ToString(), s.Title, () =>
-            s.File != null ? SongFiles.Decode(s.File) : Audio.ReadSong(s.Image, s.NrgTrack, s.Swap))).ToList();
+            s.Loader != null ? s.Loader() : s.File != null ? SongFiles.Decode(s.File) : Audio.ReadSong(s.Image, s.NrgTrack, s.Swap))).ToList();
 
         void PlayFrom(int i)
         {
@@ -228,6 +231,32 @@ namespace NrgToMp3Win
                     Add(Directory.GetFiles(p).Where(f => SongFiles.AudioExtensions.Contains(Path.GetExtension(f).ToLowerInvariant())).OrderBy(f => f));
             }
             Rebuild();
+        }
+
+        /// <summary>Adds the songs of the CD in the drive and plays them. Each song is read from the CD as it comes up
+        /// (the next one in the background), so the first one takes a few seconds to start.</summary>
+        void PlayCd()
+        {
+            var letters = CdReader.DrivesWithDiscs();
+            if (letters.Count == 0) { status.Text = "No CD found. Put a music CD in the drive, wait a few seconds, then try again."; return; }
+            status.Text = $"Reading the CD in {letters[0]}…";
+            Task.Run(() =>
+            {
+                var d = DiscItem.FromCd(letters[0]);
+                d.ReadTrack(d.Songs[0]);        // the first song, so playing starts without a long wait
+                return d;
+            }).ContinueWith(r => BeginInvoke(() =>
+            {
+                if (r.IsFaulted) { status.Text = "Couldn't read the CD: " + r.Exception?.InnerException?.Message; return; }
+                var d = r.Result;
+                int first = songs.Count;
+                songs.AddRange(d.Songs.Select(t => new PlayerSong { Title = d.Name(t), Seconds = t.Sectors / 75.0, Note = $"CD, track {t.Number}", Loader = () => d.ReadTrack(t) }));
+                if (name.Text.Trim() == "") name.Text = d.Album;
+                status.Text = $"Added {d.Songs.Count} song(s) from the CD" + (d.Note != null ? $" ({d.Note})" : ".")
+                    + " CD songs aren't kept in saved playlists unless you send them to the Burn List and save it there.";
+                Rebuild();
+                PlayFrom(first);
+            }));
         }
 
         void SavePlaylist()

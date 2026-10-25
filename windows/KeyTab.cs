@@ -49,11 +49,14 @@ namespace NrgToMp3Win
         public KeyTab()
         {
             openButton.Click += (_, _) => opener.Browse();
+            var cdButton = new Button { Text = "Open CD", AutoSize = true };
+            cdButton.Click += (_, _) => { player.Load(null); source = changed = lastLoaded = null; songTitle = null; ShowState(); opener.OpenCd(); };
+            new ToolTip().SetToolTip(cdButton, "Choose a song from the music CD in the drive");
             closeButton.Click += (_, _) => Close();
             listButton.Click += (_, _) => BackToList();
             new ToolTip().SetToolTip(listButton, "Back to the list of songs on the disc");
             var header = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            header.Controls.AddRange(new Control[] { title, listButton, openButton, closeButton });
+            header.Controls.AddRange(new Control[] { title, listButton, openButton, cdButton, closeButton });
             opener.Loaded += LoadSong;
 
             down.Click += (_, _) => { if (halfSteps > -12) { halfSteps--; Changed(); } };

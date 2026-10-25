@@ -226,7 +226,7 @@ namespace NrgToMp3Win
         readonly string idle;
 
         /// <summary>True when the current song came from a disc image with several songs, so "Song List" can go back to it.</summary>
-        public bool HasList => image != null && image.Songs.Count > 1;
+        public bool HasList => image != null && (image.Songs.Count > 1 || image.IsCd);
 
         public SongOpener(string what)
         {
@@ -310,6 +310,27 @@ namespace NrgToMp3Win
             else ShowMessage($"{Path.GetFileName(path)} isn't a song or disc image this app can open.");
         }
 
+        /// <summary>The songs of the audio CD in the drive, named from the disc's CD-Text.</summary>
+        public void OpenCd()
+        {
+            var letters = CdReader.DrivesWithDiscs();
+            if (letters.Count == 0) { ShowMessage("No CD found. Put a music CD in the drive, wait a few seconds, then try again."); return; }
+            image = null;
+            ShowMessage($"Reading the CD in {letters[0]}…");
+            Task.Run(() => DiscItem.FromCd(letters[0])).ContinueWith(r => BeginInvoke(() =>
+            {
+                if (r.IsFaulted) { ShowMessage("Couldn't read the CD: " + r.Exception?.InnerException?.Message); return; }
+                var d = r.Result;
+                image = d;
+                tracks.Items.Clear();
+                foreach (var t in d.Songs)
+                    tracks.Items.Add(new ListViewItem(new[] { t.Number.ToString("00"), d.Name(t), SongCore.Short(t.Sectors / 75.0) }) { Tag = t });
+                pickTitle.Text = $"Songs on the CD{(d.Album != "" ? $" “{d.Album}”" : "")}: double-click one, or tick several and Combine Selected"
+                    + (d.Note != null ? $"   ({d.Note})" : "");
+                ShowList();
+            }));
+        }
+
         void Pick()
         {
             var item = tracks.SelectedItems.Count == 1 ? tracks.SelectedItems[0] : tracks.FocusedItem;
@@ -318,8 +339,8 @@ namespace NrgToMp3Win
 
         void LoadTrack(DiscItem d, Nrg.Track t)
         {
-            ShowMessage("Reading the song…");
-            Task.Run(() => Audio.ReadSong(d.Nrg.DataPath, t, d.Swap)).ContinueWith(r => BeginInvoke(() =>
+            ShowMessage(d.IsCd ? "Reading the song from the CD…" : "Reading the song…");
+            Task.Run(() => d.ReadTrack(t)).ContinueWith(r => BeginInvoke(() =>
             {
                 if (r.IsFaulted) { ShowMessage("Couldn't read the song: " + r.Exception?.InnerException?.Message); return; }
                 Loaded?.Invoke(d.Name(t), r.Result);

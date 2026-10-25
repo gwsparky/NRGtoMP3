@@ -25,7 +25,7 @@ be created from a cloud session.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **27**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **28**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -77,6 +77,11 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 8. **Install on This PC…** (top bar), then uninstall from Settings → Apps.
 
 `BurnCore.cs` is tested headlessly (images written and read back with `Nrg.Read`: exact gaps, audio identical, playlists round-trip).
+
+**Added in build 28 (from the Mac's builds 21–27), not yet tried on Windows:**
+9. **Waveform Viewer tab** (`WaveTab.cs`): open an image or the CD, small waveform per track (click it to tick), ↕ ticks a run, joined waveform of the ticked tracks with orange track starts, Play Joined / click to play from a point, Apply Name ("Song (part 1 of 3)"), Save/Load Names, Look Up, Get from GitHub, Open in Convert Tab. No export, so Enter can't export.
+10. **CDs as discs:** `DiscItem.FromCd` (CD-Text names via `CdReader.ReadCdText` → `IOCTL_CDROM_READ_TOC_EX` format 5, parsed by the cross-platform `CdText.cs`; songs read on demand by `DiscItem.ReadTrack`, last 3 cached). Used by **Player → Play CD**, **Change Key → Open CD** (`SongOpener.OpenCd`) and the Waveform Viewer.
+11. **Burn CD:** Look Up Names… (`LookupForm` now takes any song count/TOC/apply callback; `BurnList.Toc()` is inexact), and adding an image loads its names file and then `names/<image>.txt` from GitHub. `DiscArtist` goes into the CUE as PERFORMER.
 
 **Differences from the Mac still open:**
 - Burn CD on Windows writes **no CD-Text** (song names on the disc) and has **no test burn** or speed choice. CD-Text with the raw burner needs R-W subcode packs (`IRawCDImageCreator.AddSubcodeRWGenerator`).

@@ -14,7 +14,9 @@ namespace NrgToMp3Win
     /// <summary>Find album and song names on MusicBrainz and apply them to a disc.</summary>
     class LookupForm : Form
     {
-        readonly DiscItem disc;
+        readonly int count;                 // songs being named
+        readonly Toc toc;
+        readonly Action<string, string, List<string>> apply;   // album, artist, song names
         readonly TextBox album = new() { Width = 260 }, artist = new() { Width = 200, PlaceholderText = "Artist (optional)" };
         readonly ListView results = new() { View = View.Details, FullRowSelect = true, MultiSelect = false, Dock = DockStyle.Fill, HideSelection = false };
         readonly ListBox songs = new() { Dock = DockStyle.Fill, IntegralHeight = false };
@@ -23,27 +25,36 @@ namespace NrgToMp3Win
         readonly Button use = new() { Text = "Use These Names", AutoSize = true, Enabled = false };
         (string album, string artist, List<string> titles)? preview;
 
-        public LookupForm(DiscItem d)
+        /// <summary>Names an opened disc image or CD.</summary>
+        public LookupForm(DiscItem d) : this(System.IO.Path.GetFileName(d.Path), d.Songs.Count, d.Toc, d.Album, d.Artist, (album, artist, titles) =>
         {
-            disc = d;
+            d.Album = album;
+            d.Artist = artist;
+            for (int i = 0; i < d.Songs.Count && i < titles.Count; i++)
+                if (titles[i] != "") d.Names[d.Songs[i].Number] = titles[i];
+        }) { }
+
+        public LookupForm(string heading, int count, Toc toc, string startAlbum, string startArtist, Action<string, string, List<string>> apply)
+        {
+            this.count = count; this.toc = toc; this.apply = apply;
             Text = "Look Up Song Names";
             ClientSize = new Size(860, 560);
             StartPosition = FormStartPosition.CenterParent;
             Font = new Font("Segoe UI", 9.5f);
             MinimizeBox = MaximizeBox = false;
-            album.Text = d.Album;
-            artist.Text = d.Artist;
+            album.Text = startAlbum;
+            artist.Text = startArtist;
             album.PlaceholderText = "Album";
 
             var search = new Button { Text = "Search", AutoSize = true };
             search.Click += async (_, _) => await DoSearch();
             album.KeyDown += async (_, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; await DoSearch(); } };
             artist.KeyDown += async (_, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; await DoSearch(); } };
-            var match = new Button { Text = "Match Disc", AutoSize = true, Enabled = d.Toc != null };
+            var match = new Button { Text = "Match Disc", AutoSize = true, Enabled = toc != null };
             match.Click += async (_, _) => await DoMatch();
 
             var top = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding(8), WrapContents = true };
-            top.Controls.Add(new Label { Text = $"{System.IO.Path.GetFileName(d.Path)} · {d.Songs.Count} songs", AutoSize = true, Font = new Font(Font, FontStyle.Bold), Margin = new Padding(3, 3, 3, 8) });
+            top.Controls.Add(new Label { Text = $"{heading} · {count} songs", AutoSize = true, Font = new Font(Font, FontStyle.Bold), Margin = new Padding(3, 3, 3, 8) });
             top.SetFlowBreak(top.Controls[0], true);
             top.Controls.AddRange(new Control[] { album, artist, search, match });
 
@@ -68,7 +79,7 @@ namespace NrgToMp3Win
             Controls.Add(bottom);
             AcceptButton = use;
             CancelButton = cancel;
-            Shown += async (_, _) => { if (d.Toc?.Exact == true) await DoMatch(); };
+            Shown += async (_, _) => { if (toc?.Exact == true) await DoMatch(); };
             Theme.Apply(this);
             Dpi.Scale(this);
         }
@@ -86,10 +97,10 @@ namespace NrgToMp3Win
         {
             results.Items.Clear();
             songs.Items.Clear(); songsHeader.Text = ""; preview = null; use.Enabled = false;
-            foreach (var r in found.OrderBy(r => r.TrackCount == disc.Songs.Count ? 0 : 1))
+            foreach (var r in found.OrderBy(r => r.TrackCount == count ? 0 : 1))
             {
                 var item = new ListViewItem(new[] { r.Title, r.Artist, r.Date, r.Country, r.TrackCount.ToString() }) { Tag = r };
-                if (r.TrackCount == disc.Songs.Count) item.ForeColor = Color.DarkGreen;
+                if (r.TrackCount == count) item.ForeColor = Color.DarkGreen;
                 results.Items.Add(item);
             }
             if (results.Items.Count == 1) results.Items[0].Selected = true;
@@ -97,10 +108,10 @@ namespace NrgToMp3Win
 
         Task DoMatch() => Run("Looking for this disc…", async () =>
         {
-            var found = await MusicBrainz.Lookup(disc.Toc);
+            var found = await MusicBrainz.Lookup(toc);
             Show(found);
             status.Text = found.Count > 0 ? $"Found {found.Count} matching release(s)."
-                : disc.Toc.Exact ? "This disc isn't in MusicBrainz. Try searching by album or artist."
+                : toc.Exact ? "This disc isn't in MusicBrainz. Try searching by album or artist."
                 : "No match. This file's song breaks were guessed from silences, so search by album or artist instead.";
         });
 
@@ -109,7 +120,7 @@ namespace NrgToMp3Win
             var found = await MusicBrainz.Search(album.Text.Trim(), artist.Text.Trim());
             Show(found);
             status.Text = found.Count == 0 ? "Nothing found. Try fewer or different words."
-                : $"{found.Count} result(s). Green ones have {disc.Songs.Count} songs, like your disc.";
+                : $"{found.Count} result(s). Green ones have {count} songs, like your disc.";
         });
 
         async Task LoadPreview()
@@ -118,12 +129,12 @@ namespace NrgToMp3Win
             var r = (Release)results.SelectedItems[0].Tag;
             await Run("Loading songs…", async () =>
             {
-                var t = await MusicBrainz.Tracks(r.Id, disc.Songs.Count);
+                var t = await MusicBrainz.Tracks(r.Id, count);
                 if (results.SelectedItems.Count == 0 || !ReferenceEquals(results.SelectedItems[0].Tag, r)) return;
                 preview = t;
                 songs.Items.Clear();
                 for (int i = 0; i < t.titles.Count; i++) songs.Items.Add($"{i + 1:00}  {t.titles[i]}");
-                songsHeader.Text = $"{t.album}\n{t.artist}" + (t.titles.Count != disc.Songs.Count ? $"   ⚠ {t.titles.Count} songs (yours has {disc.Songs.Count}); applied in order" : "");
+                songsHeader.Text = $"{t.album}\n{t.artist}" + (t.titles.Count != count ? $"   ⚠ {t.titles.Count} songs (yours has {count}); applied in order" : "");
                 use.Enabled = true;
                 status.Text = "";
             });
@@ -132,10 +143,7 @@ namespace NrgToMp3Win
         void Apply()
         {
             if (preview is not { } p) return;
-            disc.Album = p.album;
-            disc.Artist = p.artist;
-            for (int i = 0; i < disc.Songs.Count && i < p.titles.Count; i++)
-                if (p.titles[i] != "") disc.Names[disc.Songs[i].Number] = p.titles[i];
+            apply(p.album, p.artist, p.titles);
             DialogResult = DialogResult.OK;
         }
     }

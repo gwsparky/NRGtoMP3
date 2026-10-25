@@ -19,6 +19,7 @@ namespace NrgToMp3Win
         public string Image;                // or the audio file of a disc image (.nrg, or a .cue's .bin)
         public PlaylistTrack Track;
         public bool Swap;
+        public Func<byte[]> Loader;         // or read some other way (a song on a CD in the drive); not saved in playlists
 
         public Nrg.Track NrgTrack => new() { Number = Track.number, SectorSize = Track.sectorSize, Mode = 7, Start = Track.start, End = Track.start + Track.sectors * Track.sectorSize };
         public string Source => Note ?? (File != null ? Path.GetFileName(File) : $"{Path.GetFileName(Image)}, track {Track.number}");
