@@ -1,0 +1,18 @@
+# Song names for Bow the Knee.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Bow the Knee
+1. Track 01
+2. Track 02
+3. Track 03
+4. Track 04
+5. Track 05
+6. Track 06
+7. Track 07
+8. Track 08
+9. Bow The Knee
+10. Track 10
+11. Track 11
+12. Track 12
+13. Track 13
+14. Track 14
+15. Track 15
