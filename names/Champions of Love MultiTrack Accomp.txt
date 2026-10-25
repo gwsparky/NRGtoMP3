@@ -1,0 +1,61 @@
+# Song names for Champions of Love MultiTrack Accomp.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Champions of Love MultiTrack Accomp
+1. Champion of Love  01
+2. Champion of Love  02
+3. Champion of Love  03
+4. Champion of Love  04
+5. Champion of Love  05
+6. Champion of Love  06
+7. Champion of Love  07
+8. The Day He Wore My Crown  08
+9. The Day He Wore My Crown  09
+10. The Day He Wore My Crown  10
+11. The Day He Wore My Crown  11
+12. The Day He Wore My Crown  12
+13. The Day He Wore My Crown  13
+14. Love Grew Where the Blood Fell  14
+15. Love Grew Where the Blood Fell  15
+16. Love Grew Where the Blood Fell  16
+17. Love Grew Where the Blood Fell  17
+18. Love Grew Where the Blood Fell  18
+19. Love Lifted Me  19
+20. Love Lifted Me  20
+21. Love Lifted Me  21
+22. Love Lifted Me  22
+23. Love Lifted Me  23
+24. Love Lifted Me  24
+25. Love Lifted Me  25
+26. Love Lifted Me  26
+27. When He Spoke  27
+28. When He Spoke  28
+29. When He Spoke  29
+30. When He Spoke  30
+31. When He Spoke  31
+32. Gone  32
+33. Gone  33
+34. Gone  34
+35. Gone  35
+36. Gone  36
+37. Gone  37
+38. Cornerstone  38
+39. Cornerstone  39
+40. Cornerstone  40
+41. Cornerstone  41
+42. Cornerstone  42
+43. Cornerstone  43
+44. Cornerstone  44
+45. Midnight Cry  45
+46. Midnight Cry  46
+47. Midnight Cry  47
+48. Midnight Cry  48
+49. Midnight Cry  49
+50. Midnight Cry  50
+51. Midnight Cry  51
+52. Hallelujah Praise the Lamb Champion of Love Melody  52
+53. Hallelujah Praise the Lamb Champion of Love Melody  53
+54. Hallelujah Praise the Lamb Champion of Love Melody  54
+55. Hallelujah Praise the Lamb Champion of Love Melody  55
+56. Hallelujah Praise the Lamb Champion of Love Melody  56
+57. Hallelujah Praise the Lamb Champion of Love Melody  57
+58. Hallelujah Praise the Lamb Champion of Love Melody  58
