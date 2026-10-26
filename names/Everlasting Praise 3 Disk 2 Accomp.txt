@@ -1,0 +1,51 @@
+# Song names for Everlasting Praise 3 Disk 2 Accomp.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Everlasting Praise 3 Disk 2 Accompaniment
+1. Sing Sing Sing  01
+2. Sing Sing Sing  02
+3. Sing Sing Sing  03
+4. Sing Sing Sing  04
+5. Sing Sing Sing  05
+6. Jesus Messiah  06
+7. Jesus Messiah  07
+8. Jesus Messiah  08
+9. Jesus Messiah  09
+10. Jesus Messiah  10
+11. Living He Loved Me  11
+12. Living He Loved Me  12
+13. Living He Loved Me  13
+14. Living He Loved Me  14
+15. At the Cross  15
+16. At the Cross  16
+17. At the Cross  17
+18. At the Cross  18
+19. For all You've Done  19
+20. For all You've Done  20
+21. For all You've Done  21
+22. For all You've Done  22
+23. For all You've Done  23
+24. The Blood of Jesus  24
+25. The Blood of Jesus  25
+26. The Blood of Jesus  26
+27. The Blood of Jesus  27
+28. The Blood of Jesus  28
+29. Jesus Our Rock  29
+30. Jesus Our Rock  30
+31. Jesus Our Rock  31
+32. Jesus Our Rock  32
+33. Jesus Our Rock  33
+34. Our God is Great  34
+35. Our God is Great  35
+36. Our God is Great  36
+37. Our God is Great  37
+38. Our God is Great  38
+39. Our God is Great  39
+40. Going Home  40
+41. Going Home  41
+42. Going Home  42
+43. Going Home  43
+44. Going Home  44
+45. I Will Rise  45
+46. I Will Rise  46
+47. I Will Rise  47
+48. I Will Rise  48
