@@ -1,0 +1,86 @@
+# Song names for Everlasting Praise 4 Disk 1 Acomp.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Everlasting Praise 4 Disk 1 Accompaniment
+Artist: Mike Speck
+1. To the King  01
+2. To the King  02
+3. To the King  03
+4. To the King  04
+5. To the King  05
+6. Brand New Morning  06
+7. Brand New Morning  07
+8. Brand New Morning  08
+9. Brand New Morning  09
+10. Brand New Morning  10
+11. Brand New Morning  11
+12. Christ is Resen Indeed  12
+13. Christ is Resen Indeed  13
+14. Christ is Resen Indeed  14
+15. Christ is Resen Indeed  15
+16. Christ is Resen Indeed  16
+17. Christ is Resen Indeed  17
+18. Christ is Resen Indeed  18
+19. Christ is Resen Indeed  19
+20. Christ is Resen Indeed  20
+21. Sing to the Lord  21
+22. Sing to the Lord  22
+23. Sing to the Lord  23
+24. Sing to the Lord  24
+25. Sing to the Lord  25
+26. Sing to the Lord  26
+27. Sing to the Lord  27
+28. Sing to the Lord  28
+29. God is Faithful  29
+30. God is Faithful  30
+31. God is Faithful  31
+32. God is Faithful  32
+33. God is Faithful  33
+34. God is Faithful  34
+35. God is Faithful  35
+36. God is Faithful  36
+37. God is Faithful  37
+38. God is Faithful  38
+39. Lord, You're Mighty  39
+40. Lord, You're Mighty  40
+41. Lord, You're Mighty  41
+42. Lord, You're Mighty  42
+43. Lord, You're Mighty  43
+44. Lord, You're Mighty  44
+45. Lord, You're Mighty  45
+46. 10,000 Reasons  46
+47. 10,000 Reasons  47
+48. 10,000 Reasons  48
+49. 10,000 Reasons  49
+50. 10,000 Reasons  50
+51. 10,000 Reasons  51
+52. 10,000 Reasons  52
+53. 10,000 Reasons  53
+54. 10,000 Reasons  54
+55. 10,000 Reasons  55
+56. Fathers Love  56
+57. Fathers Love  57
+58. Fathers Love  58
+59. Fathers Love  59
+60. Fathers Love  60
+61. Fathers Love  61
+62. Fathers Love  62
+63. Fathers Love  63
+64. Fathers Love  64
+65. Fathers Love  65
+66. Fathers Love  66
+67. Fathers Love  67
+68. Redeemed  68
+69. Redeemed  69
+70. Redeemed  70
+71. Redeemed  71
+72. Redeemed  72
+73. Redeemed  73
+74. Redeemed  74
+75. Revelation Song  75
+76. Revelation Song  76
+77. Revelation Song  77
+78. Revelation Song  78
+79. Revelation Song  79
+80. Revelation Song  80
+81. Revelation Song  81
+82. Revelation Song  82
