@@ -1,0 +1,9 @@
+# Song names for Forever Kari Jobe.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Forever Accomp
+Artist: Kari Jobe
+1. Forever Accomp Demonstration
+2. Forever Accomp Original W/ BGV
+3. Forever Accomp High W/ BGV
+4. Forever Accomp Low W/ BGV
+5. Forever Accomp Original W/O BGV
