@@ -1,0 +1,4 @@
+# Song names for Every Knee Shaw Bow Raised.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Every Knee Shall Bow Raised
+1. Every Knee Shall Bow Raised Key Non Split
