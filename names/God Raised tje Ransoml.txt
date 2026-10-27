@@ -1,0 +1,14 @@
+# Song names for God Raised tje Ransoml.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: God Raised the Ransom
+1. God Raised the Ransom Track 01
+2. God Raised the Ransom Track 02
+3. God Raised the Ransom Track 03
+4. God Raised the Ransom Track 04
+5. God Raised the Ransom Track 05
+6. God Raised the Ransom Track 06
+7. God Raised the Ransom Track 07
+8. God Raised the Ransom Track 08
+9. God Raised the Ransom Track 09
+10. God Raised the Ransom Track 10
+11. God Raised the Ransom Performance
