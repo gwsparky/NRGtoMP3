@@ -1,6 +1,6 @@
 # Song names for grace will always be greater than sin.nrg
 # One song per line: a number, then the name. Lines starting with # are ignored.
-Album: Grace will always be greater than sin
+Album: Grace will Always Be Greater Than Sin
 1. Grace will Always Be Greater Than Sin Stereo Track 01
 2. Grace will Always Be Greater Than Sin Stereo Track 02
 3. Grace will Always Be Greater Than Sin Stereo Track 03
