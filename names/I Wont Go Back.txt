@@ -1,0 +1,15 @@
+# Song names for I Wont Go Back.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: I Won't Go Back
+Artist: Lifeway Worship
+1. I Won't Go Back - split track 01
+2. I Won't Go Back - split track Track 02
+3. I Won't Go Back - split track Track 03
+4. I Won't Go Back - split track Track 04
+5. I Won't Go Back - split track Track 05
+6. I Won't Go Back - stereo Track 06
+7. I Won't Go Back - stereo Track 07
+8. I Won't Go Back - stereo Track 08
+9. I Won't Go Back - stereo Track 09
+10. I Won't Go Back - stereo Track 10
+11. I Won't Go Back - demo
