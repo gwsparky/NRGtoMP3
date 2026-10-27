@@ -1,0 +1,18 @@
+# Song names for Four Days Late.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Four Days Late
+1. Four Days Late Track 01
+2. Four Days Late Track 02
+3. Four Days Late Track 03
+4. Four Days Late Track 04
+5. Four Days Late Track 05
+6. Four Days Late Track 06
+7. Four Days Late Track 07
+8. Four Days Late Track 08
+9. Four Days Late Track 09
+10. Four Days Late Track 10
+11. Four Days Late Track 11
+12. Four Days Late Track 12
+13. Four Days Late Track 13
+14. Four Days Late Track 14
+15. Four Days Late Performace
