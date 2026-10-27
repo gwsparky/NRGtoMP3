@@ -1,0 +1,8 @@
+# Song names for Hope Was Born this night.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Hope Was Born this night
+1. Hope Was Born this night Demo Track 01
+2. Hope Was Born this night  Orig w/BGV Track 02
+3. Hope Was Born this night  Low w/BGV Track 03
+4. Hope Was Born this night  Medium w/BGV Track 04
+5. Hope Was Born this night  High w/BGV Track 05
