@@ -1,0 +1,12 @@
+# Song names for Jerusalem.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Jerusalem - Accompaniment CD
+Artist: Brentwood Benson
+1. Jerusalem - m. 1 - Split-Track 1
+2. Jerusalem - m. 7 - Split-Track 2
+3. Jerusalem - m. 24 - Split-Track 3
+4. Jerusalem - m. 42 - Split-Track 4
+5. Jerusalem - m. 59 - Split-Track 5
+6. Jerusalem - m. 75 - Split-Track 6
+7. Jerusalem - Listening Demo Track 7
+8. Jerusalem - Stereo-Track Track 8
