@@ -1,0 +1,6 @@
+# Song names for Jesus Only Jesus.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Jesus Only Jesus
+1. Jesus Only Jesus Low Key Track 01
+2. Jesus Only Jesus Medium Key Track 02
+3. Jesus Only Jesus High Key Track 03
