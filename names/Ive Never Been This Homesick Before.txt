@@ -1,0 +1,11 @@
+# Song names for Ive Never Been This Homesick Before.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Ive Never Been This Homesick Before
+1. Ive Never Been This Homesick Before Split Track 01
+2. Ive Never Been This Homesick Before Split Track 02
+3. Ive Never Been This Homesick Before Split Track 03
+4. Ive Never Been This Homesick Before Split Track 04
+5. Ive Never Been This Homesick Before Split Track 05
+6. Ive Never Been This Homesick Before Split Track 06
+7. Ive Never Been This Homesick Before Split Track 07
+8. Ive Never Been This Homesick Before Demo Track 08
