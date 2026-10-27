@@ -1,0 +1,11 @@
+# Song names for In Christ Alone Medley.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: In Christ Alone Medley
+1. In Christ Alone Medley Split Track 01
+2. In Christ Alone Medley Split Track 02
+3. In Christ Alone Medley Split Track 03
+4. In Christ Alone Medley Split Track 04
+5. In Christ Alone Medley Split Track 05
+6. In Christ Alone Medley Split Track 06
+7. In Christ Alone Medley Split Track 07
+8. In Christ Alone Medley Demo Track 08
