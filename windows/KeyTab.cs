@@ -18,7 +18,7 @@ namespace NrgToMp3Win
         (float[] l, float[] r) sourcePeaks, changedPeaks;
         int halfSteps, cents;
         readonly SongOpener opener = new("change its key") { Dock = DockStyle.Fill };
-        readonly Panel editor = new() { Dock = DockStyle.Fill, Visible = false };
+        readonly Panel editor = new() { Dock = DockStyle.Fill, Visible = false, AutoScroll = true };
         readonly Label title = new() { AutoSize = true, Font = new Font("Segoe UI", 11f, FontStyle.Bold), Margin = new Padding(3, 6, 3, 3) };
         readonly Button openButton = new() { Text = "Open Song…", AutoSize = true }, closeButton = new() { Text = "Close", AutoSize = true, Visible = false };
         readonly Button listButton = new() { Text = "◀ Song List", AutoSize = true, Visible = false };
@@ -37,6 +37,7 @@ namespace NrgToMp3Win
         readonly WaveformView wave = new() { Dock = DockStyle.Top, Height = 180 };
         readonly Label waveCaption = new() { Dock = DockStyle.Top, Height = 22, ForeColor = SystemColors.GrayText };
         readonly Button play = new() { Text = "▶ Play", Width = 90 };
+        readonly Button stop = new() { Text = "⏹ Stop", Width = 90 };
         readonly Label time = new() { AutoSize = true, Font = new Font("Segoe UI", 11f), Margin = new Padding(8, 6, 8, 3) };
         readonly RadioButton hearNew = new() { Text = "New key", AutoSize = true, Checked = true, Margin = new Padding(3, 8, 3, 3) };
         readonly RadioButton hearOriginal = new() { Text = "Original (to compare)", AutoSize = true, Margin = new Padding(3, 8, 3, 3) };
@@ -87,13 +88,14 @@ namespace NrgToMp3Win
             row3.Controls.AddRange(new Control[] { new Label { Text = "Channels:", AutoSize = true, Margin = new Padding(3, 7, 3, 3) }, channels, fill, warning });
 
             play.Click += (_, _) => player.Toggle();
+            stop.Click += (_, _) => { player.Pause(); player.Seek(0); };
             hearNew.CheckedChanged += (_, _) => UpdatePreview();
             var transport = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            transport.Controls.AddRange(new Control[] { play, time, hearNew, hearOriginal, willBeNamed });
+            transport.Controls.AddRange(new Control[] { play, stop, time, hearNew, hearOriginal, willBeNamed });
             wave.SeekRequested += t => player.Seek(t);
 
-            editor.Controls.Add(transport); editor.Controls.Add(waveCaption); editor.Controls.Add(wave);
-            editor.Controls.Add(row3); editor.Controls.Add(row2); editor.Controls.Add(row1);
+            editor.Controls.Add(waveCaption); editor.Controls.Add(wave);
+            editor.Controls.Add(row3); editor.Controls.Add(row2); editor.Controls.Add(row1); editor.Controls.Add(transport);
 
             export.ExportButton.Click += (_, _) => Export();
             var toBurn = new Button { Text = "Add to Burn List", AutoSize = true };
