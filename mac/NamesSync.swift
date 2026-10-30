@@ -48,7 +48,7 @@ enum NamesSync {
         var req = URLRequest(url: URL(string: "https://api.github.com/repos/\(r)/contents/\(path)")!)
         req.httpMethod = method
         req.timeoutInterval = 20
-        req.setValue("NRGtoMP3/1.0", forHTTPHeaderField: "User-Agent")
+        req.setValue("ChurchSound/1.0", forHTTPHeaderField: "User-Agent")
         req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         if let t = token, !t.isEmpty { req.setValue("Bearer \(t)", forHTTPHeaderField: "Authorization") }
         return req

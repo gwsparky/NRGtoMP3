@@ -9,7 +9,7 @@ import AVFoundation
 struct NrgToMp3App: App {
     var body: some Scene {
         // the build number comes from the BUILD file (shared with the Windows app), via Info.plist
-        WindowGroup("NRG to MP3 (Mac build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))") {
+        WindowGroup("ChurchSound (Mac build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))") {
             RootView().frame(minWidth: 700, minHeight: 700)
         }
         .windowResizability(.contentMinSize)

@@ -10,8 +10,8 @@ namespace NrgToMp3Win
     /// (and optionally desktop) shortcut, and an entry in Settings → Apps for uninstalling. No admin rights needed.</summary>
     static class Install
     {
-        const string AppName = "NRG to MP3";
-        const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\NRG to MP3";
+        const string AppName = "ChurchSound";
+        const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\ChurchSound";
         static readonly string Folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", AppName);
         static readonly string InstalledExe = Path.Combine(Folder, AppName + ".exe");
         static readonly string StartMenuLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), AppName + ".lnk");
@@ -25,7 +25,7 @@ namespace NrgToMp3Win
         public static void Run(IWin32Window owner)
         {
             var answer = MessageBox.Show(owner,
-                (IsInstalled ? "Replace the installed copy of NRG to MP3 with this one?\n\n" : "Install NRG to MP3 on this PC?\n\n")
+                (IsInstalled ? "Replace the installed copy of ChurchSound with this one?\n\n" : "Install ChurchSound on this PC?\n\n")
                 + "It's copied to your Programs folder and added to the Start menu, and it can be removed again in Settings → Apps.\n\n"
                 + "Also put a shortcut on the desktop?",
                 "Install", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -50,7 +50,8 @@ namespace NrgToMp3Win
                     key.SetValue("NoModify", 1); key.SetValue("NoRepair", 1);
                     key.SetValue("EstimatedSize", (int)(new FileInfo(InstalledExe).Length / 1024));
                 }
-                if (MessageBox.Show(owner, "Installed. You'll find NRG to MP3 in the Start menu.\n\nStart the installed copy now (and close this one)?", "Install",
+                RemoveOldName();
+                if (MessageBox.Show(owner, "Installed. You'll find ChurchSound in the Start menu.\n\nStart the installed copy now (and close this one)?", "Install",
                                     MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     Process.Start(new ProcessStartInfo(InstalledExe) { UseShellExecute = true });
@@ -58,6 +59,18 @@ namespace NrgToMp3Win
                 }
             }
             catch (Exception ex) { MessageBox.Show(owner, "Couldn't install: " + ex.Message, "Install", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+        }
+
+        /// <summary>The app used to be called NRG to MP3: clears away a copy installed under that name.</summary>
+        static void RemoveOldName()
+        {
+            const string old = "NRG to MP3";
+            var folder = Path.Combine(Path.GetDirectoryName(Folder), old);
+            if (Path.GetFullPath(Me).StartsWith(folder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return;
+            foreach (var dir in new[] { Environment.SpecialFolder.Programs, Environment.SpecialFolder.DesktopDirectory })
+                try { File.Delete(Path.Combine(Environment.GetFolderPath(dir), old + ".lnk")); } catch { }
+            try { Registry.CurrentUser.DeleteSubKeyTree(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + old, false); } catch { }
+            try { Directory.Delete(folder, true); } catch { }
         }
 
         static void Shortcut(string link)
@@ -71,10 +84,10 @@ namespace NrgToMp3Win
             s.Save();
         }
 
-        /// <summary>"NRG to MP3.exe --uninstall", run from Settings → Apps. Settings (folders, colour) are kept.</summary>
+        /// <summary>"ChurchSound.exe --uninstall", run from Settings → Apps. Settings (folders, colour) are kept.</summary>
         public static void Uninstall()
         {
-            if (MessageBox.Show("Remove NRG to MP3 from this PC?\n\nYour music, disc images and playlists are not touched.", "Uninstall",
+            if (MessageBox.Show("Remove ChurchSound from this PC?\n\nYour music, disc images and playlists are not touched.", "Uninstall",
                                 MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK) return;
             foreach (var link in new[] { StartMenuLink, DesktopLink }) try { File.Delete(link); } catch { }
             try { Registry.CurrentUser.DeleteSubKeyTree(UninstallKey, false); } catch { }
@@ -85,7 +98,7 @@ namespace NrgToMp3Win
                 { CreateNoWindow = true, UseShellExecute = false, WorkingDirectory = Path.GetTempPath() });
             }
             catch { }
-            MessageBox.Show("NRG to MP3 has been removed.", "Uninstall");
+            MessageBox.Show("ChurchSound has been removed.", "Uninstall");
         }
     }
 }

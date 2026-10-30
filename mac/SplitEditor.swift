@@ -204,7 +204,7 @@ final class SplitModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
         var rawBase: Int64 = 0
         switch item.source {
         case .file:
-            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("NRG to MP3 splits")
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ChurchSound splits")
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             let f = dir.appendingPathComponent(UUID().uuidString + ".pcm")
             try pcm.write(to: f)

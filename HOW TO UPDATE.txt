@@ -1,5 +1,5 @@
-HOW TO UPDATE NRG TO MP3 (on the Mac)
-=====================================
+HOW TO UPDATE CHURCHSOUND (on the Mac)
+======================================
 
 Your project lives in two places:
   - On GitHub:   https://github.com/gwsparky/NRGtoMP3
@@ -18,9 +18,9 @@ sidebar, under Pinned). Then type:
     Update from GitHub and build the Mac version.
 
 When it's finished, the new files are in Desktop > NrgToMp3 > dist:
-  - NRG to MP3 Installer.dmg   (double-click it, then drag the app
+  - ChurchSound Installer.dmg  (double-click it, then drag the app
                                 into Applications)
-  - NRG to MP3.app             (the app itself)
+  - ChurchSound.app            (the app itself)
 
 Check the build number in the app's title to make sure it's the
 new one.

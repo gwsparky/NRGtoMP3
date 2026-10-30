@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Windows 10/11 version of NRG to MP3. Built from the Mac with: windows/build-windows.sh -->
+  <!-- Windows 10/11 version of ChurchSound. Built from the Mac with: windows/build-windows.sh -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -11,7 +11,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-    <AssemblyName>NRG to MP3</AssemblyName>
+    <AssemblyName>ChurchSound</AssemblyName>
     <RootNamespace>NrgToMp3Win</RootNamespace>
     <StartupObject>NrgToMp3Win.App</StartupObject>
     <ApplicationIcon>icon.ico</ApplicationIcon>

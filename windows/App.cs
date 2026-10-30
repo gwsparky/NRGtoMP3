@@ -24,7 +24,7 @@ namespace NrgToMp3Win
         }
     }
 
-    /// <summary>Remembered choices, kept in %APPDATA%\NRG to MP3\settings.json.</summary>
+    /// <summary>Remembered choices, kept in %APPDATA%\NRG to MP3\settings.json (the app's old name: kept so existing settings and the GitHub key survive).</summary>
     static class Settings
     {
         static readonly string file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NRG to MP3", "settings.json");
@@ -95,7 +95,7 @@ namespace NrgToMp3Win
         public MainForm()
         {
             SuspendLayout();
-            Text = $"NRG to MP3 (Windows build {Build})";
+            Text = $"ChurchSound (Windows build {Build})";
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
             ClientSize = new Size(1100, 760);
             MinimumSize = new Size(900, 620);
@@ -134,7 +134,7 @@ namespace NrgToMp3Win
             {
                 var install = new Button { Text = Install.IsInstalled ? "Update Installed Copy…" : "Install on This PC…", AutoSize = true };
                 install.Click += (_, _) => Install.Run(this);
-                new ToolTip().SetToolTip(install, "Add NRG to MP3 to the Start menu (and Settings → Apps, to remove it later)");
+                new ToolTip().SetToolTip(install, "Add ChurchSound to the Start menu (and Settings → Apps, to remove it later)");
                 bar.Controls.Add(install);
             }
             Controls.Add(bar);

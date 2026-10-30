@@ -30,7 +30,7 @@ struct MBTracks {
 /// or the words being searched for are sent.
 enum MusicBrainz {
     static let base = "https://musicbrainz.org/ws/2/"
-    static let userAgent = "NRGtoMP3/1.0 (personal CD archiving tool)"
+    static let userAgent = "ChurchSound/1.0 (personal CD archiving tool)"
     private static var lastRequest = Date.distantPast
 
     /// MusicBrainz disc ID: SHA-1 of the table of contents, in their URL-safe Base64.

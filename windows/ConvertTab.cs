@@ -345,7 +345,7 @@ namespace NrgToMp3Win
             if (grid.Columns[e.ColumnIndex].Name != "play") return;
             if (player.IsPlaying(Id(d, t))) { player.Stop(); return; }
             try { player.Play(Id(d, t), d.Name(t), Audio.ReadSong(d.Nrg.DataPath, t, d.Swap)); }
-            catch (Exception ex) { MessageBox.Show(this, "Couldn't play this song: " + ex.Message, "NRG to MP3"); }
+            catch (Exception ex) { MessageBox.Show(this, "Couldn't play this song: " + ex.Message, "ChurchSound"); }
         }
 
         void GridEdited(object sender, DataGridViewCellEventArgs e)
@@ -370,7 +370,7 @@ namespace NrgToMp3Win
             if (Current is not { } d || d.Loading || d.Error != null) return;
             var items = d.Songs.Select(t => new PreviewPlayer.Item(Id(d, t), d.Name(t), () => Audio.ReadSong(d.Nrg.DataPath, t, d.Swap))).ToList();
             try { player.PlayAll(items, from); }
-            catch (Exception ex) { MessageBox.Show(this, "Couldn't play: " + ex.Message, "NRG to MP3"); }
+            catch (Exception ex) { MessageBox.Show(this, "Couldn't play: " + ex.Message, "ChurchSound"); }
         }
 
         void SaveNames()

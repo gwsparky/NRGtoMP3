@@ -1,4 +1,4 @@
-# NRG to MP3: project notes for Claude
+# ChurchSound (formerly NRG to MP3): project notes for Claude
 
 A desktop app (Mac **and** Windows) for George's CD archive: it opens Nero `.nrg` and `.cue/.bin` disc images, previews and plays the songs,
 and converts them to MP3/WAV. It also splits songs, changes their key, copies and burns CDs (Mac only so far), and keeps playlists.
@@ -18,14 +18,14 @@ be created from a cloud session.
 | `Nrg.cs`, `Program.cs`, `Wav.cs`, `Id3.cs` | **Shared converter**: reads `.nrg` (DAO/TAO, NER5/NERO footers, CD-Text), `.cue/.bin`, and "raw" images with no Nero track list (songs split at ≥5 s silences); exports MP3/WAV with ID3/INFO tags; `--merge`, `--list` (JSON), `--tracks`, `--meta names.json`. The Mac app runs it as a CLI; the Windows app calls `Program.Unpack` directly. | both |
 | `NrgToMp3.csproj` | builds the shared converter as the Mac CLI (`net8.0`, excludes `windows/**`) | Mac |
 | `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key, Waveform Viewer; Player and Change Key also play audio CDs with their CD-Text names via `AudioCD.swift`) | Mac |
-| `build-app.sh` | Mac build: app + `dist/NRG to MP3 Installer.dmg` | Mac |
+| `build-app.sh` | Mac build: app + `dist/ChurchSound Installer.dmg` | Mac |
 | `windows/*.cs`, `windows/NrgToMp3Win.csproj` | WinForms Windows app (`net8.0-windows`, includes the shared files above) | Windows |
 | `windows/build-windows.sh` | builds both Windows `.exe`s **from the Mac** (zsh); on Windows use the commands below | Mac |
 | `MP3toWAV/`, `NameWriteOn/`, `mp3-to-wav.html` | George's separate projects. **Not part of this app; leave them alone.** | — |
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **29**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **30**).
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -38,7 +38,7 @@ be created from a cloud session.
 - `Burner.cs`: burning with IMAPI2 via late-bound COM (`dynamic`) on an STA thread: `MsftRawCDImageCreator` + `MsftDiscFormat2RawCD` (disc-at-once, so exact/zero gaps). Each track file is the song plus the silence before the next one. Tries each raw sector type; if all fail (George's burner gave C0AA0602 "media not prepared" in builds 14–15), `BurnTab` offers `Burner.BurnStandard` (`MsftDiscFormat2TrackAtOnce`, always 2 s gaps).
 - `BurnTab.cs`: Burn CD tab. ✂ raises `BurnTab.SplitRequested` → `SplitTab.OpenBurnItem`, whose parts replace the song.
 - `CdReader.cs` (`IOCTL_CDROM_READ_TOC` / `IOCTL_CDROM_RAW_READ`, retries then sector-by-sector) + `CopyTab.cs`: Copy CD tab.
-- `Install.cs`: the app installs itself ("Install on This PC…" button): copies the exe to `%LOCALAPPDATA%\Programs\NRG to MP3`, Start-menu/desktop shortcuts, an uninstall entry in HKCU (`--uninstall`).
+- `Install.cs`: the app installs itself ("Install on This PC…" button): copies the exe to `%LOCALAPPDATA%\Programs\ChurchSound`, Start-menu/desktop shortcuts, an uninstall entry in HKCU (`--uninstall`).
 
 ## Building
 
@@ -88,6 +88,10 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 - Copy CD doesn't read CD-Text from the disc (names come from MusicBrainz or typing).
 - Burning shows elapsed time, not a percentage (IMAPI2 progress events aren't hooked up).
 - The Convert previews, Player and Burn CD tabs use separate players on Windows, so they can sound at once (the Mac shares one).
+
+## The name
+
+The app is called **ChurchSound** (renamed in build 30). Only what George sees changed. These keep the old name **on purpose**, so don't "tidy" them: the GitHub repo `gwsparky/NRGtoMP3`, project files and code namespaces (`NrgToMp3*`), the CLI tool name, the Mac bundle ID `local.nrgtomp3`, the Mac Keychain entry `NRG to MP3 GitHub` and the Windows settings folder `%APPDATA%\NRG to MP3` (changing the last three would lose his saved key and settings).
 
 ## Problems already found and fixed (don't undo)
 

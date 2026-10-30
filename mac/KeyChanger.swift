@@ -354,7 +354,7 @@ final class KeyTabState: ObservableObject {
         status = "Combining \(chosen.count) songs…"
         DispatchQueue.global().async {
             do {
-                let dir = FileManager.default.temporaryDirectory.appendingPathComponent("NRG to MP3 key changes")
+                let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ChurchSound key changes")
                 try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                 let file = dir.appendingPathComponent(UUID().uuidString + ".pcm")
                 FileManager.default.createFile(atPath: file.path, contents: nil)
@@ -425,7 +425,7 @@ final class KeyTabState: ObservableObject {
                         if p - last > 0.01 { last = p; DispatchQueue.main.async { self.progress = p } }
                     }
                 }
-                let dir = FileManager.default.temporaryDirectory.appendingPathComponent("NRG to MP3 key changes")
+                let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ChurchSound key changes")
                 try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                 let file = dir.appendingPathComponent(UUID().uuidString + ".pcm")
                 try out.write(to: file)

@@ -20,7 +20,7 @@ namespace NrgToMp3Win
 
         static NamesSync()
         {
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("NRGtoMP3/1.0");
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("ChurchSound/1.0");
             http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         }
 

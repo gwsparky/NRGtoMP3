@@ -20,7 +20,7 @@ namespace NrgToMp3Win
         static readonly HttpClient http = new() { BaseAddress = new Uri("https://musicbrainz.org/ws/2/"), Timeout = TimeSpan.FromSeconds(20) };
         static DateTime last = DateTime.MinValue;
 
-        static MusicBrainz() => http.DefaultRequestHeaders.UserAgent.ParseAdd("NRGtoMP3/1.0 (personal CD archiving tool)");
+        static MusicBrainz() => http.DefaultRequestHeaders.UserAgent.ParseAdd("ChurchSound/1.0 (personal CD archiving tool)");
 
         public static string DiscId(Toc toc)
         {

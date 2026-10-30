@@ -110,7 +110,7 @@ namespace NrgToMp3Win
                     // a fresh burner object for each try, so nothing is left over from a failed one
                     dynamic fmt = Create("IMAPI2.MsftDiscFormat2RawCD");
                     fmt.Recorder = rec;
-                    fmt.ClientName = "NRG to MP3";
+                    fmt.ClientName = "ChurchSound";
                     bool writing = false;
                     try
                     {
@@ -155,7 +155,7 @@ namespace NrgToMp3Win
                 rec.InitializeDiscRecorder(driveId);
                 dynamic fmt = Create("IMAPI2.MsftDiscFormat2TrackAtOnce");
                 fmt.Recorder = rec;
-                fmt.ClientName = "NRG to MP3";
+                fmt.ClientName = "ChurchSound";
                 int song = 0;
                 try
                 {
