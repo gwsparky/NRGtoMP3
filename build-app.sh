@@ -6,7 +6,8 @@ cd "$(dirname "$0")"
 # Assemble and sign outside the Desktop: iCloud Drive keeps adding Finder info there, which codesign rejects.
 WORK=$(mktemp -d)
 APP="$WORK/ChurchSound.app"
-BUILD=$(tr -d '[:space:]' < BUILD)   # the build number, shared with the Windows app
+BUILD=$(cat BUILD)   # the version, shared with the Windows app, e.g. "26.10.30 V2"
+BUNDLE_VERSION=${BUILD// V/.}   # macOS only accepts numbers and dots here
 dotnet publish NrgToMp3.csproj -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o dist/cli
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -32,7 +33,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>$BUILD</string>
+  <key>CFBundleVersion</key><string>$BUNDLE_VERSION</string>
+  <key>ChurchSoundVersion</key><string>$BUILD</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
@@ -42,7 +44,7 @@ codesign --force --deep -s - "$APP"
 rm -rf "dist/ChurchSound.app"
 ditto "$APP" "dist/ChurchSound.app"
 codesign -v "dist/ChurchSound.app"
-echo "Built dist/ChurchSound.app (build $BUILD)"
+echo "Built dist/ChurchSound.app (version $BUILD)"
 
 # Installer: a disk image with the app, a shortcut to Applications to drag it onto, and the install guide
 DMG="dist/ChurchSound Installer.dmg"

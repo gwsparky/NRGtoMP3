@@ -19,7 +19,7 @@
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
     <Version>1.0.0</Version>
-    <!-- the build number shown in the title bar: one BUILD file for both the Mac and Windows apps -->
+    <!-- the version shown in the title bar: one BUILD file for both the Mac and Windows apps -->
     <NrgBuild>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../BUILD').Trim())</NrgBuild>
   </PropertyGroup>
 

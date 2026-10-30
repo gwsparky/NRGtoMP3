@@ -42,7 +42,7 @@ namespace NrgToMp3Win
                 using (var key = Registry.CurrentUser.CreateSubKey(UninstallKey))
                 {
                     key.SetValue("DisplayName", AppName);
-                    key.SetValue("DisplayVersion", $"1.0 (build {MainForm.Build})");
+                    key.SetValue("DisplayVersion", MainForm.Build);
                     key.SetValue("Publisher", "George");
                     key.SetValue("DisplayIcon", InstalledExe);
                     key.SetValue("InstallLocation", Folder);

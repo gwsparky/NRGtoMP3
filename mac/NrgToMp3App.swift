@@ -8,8 +8,8 @@ import AVFoundation
 #endif
 struct NrgToMp3App: App {
     var body: some Scene {
-        // the build number comes from the BUILD file (shared with the Windows app), via Info.plist
-        WindowGroup("ChurchSound (Mac build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))") {
+        // the date version comes from the BUILD file (shared with the Windows app), via Info.plist
+        WindowGroup("ChurchSound (Mac version \(Bundle.main.infoDictionary?["ChurchSoundVersion"] as? String ?? "?"))") {
             RootView().frame(minWidth: 700, minHeight: 700)
         }
         .windowResizability(.contentMinSize)

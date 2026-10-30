@@ -87,15 +87,15 @@ namespace NrgToMp3Win
 
     class MainForm : Form
     {
-        // shown in the title bar, to tell test versions apart; comes from the BUILD file, shared with the Mac app
-        public static readonly int Build = int.TryParse(System.Reflection.Assembly.GetExecutingAssembly()
+        // the date version shown in the title bar (26.10.30, then 26.10.30 V2...); comes from the BUILD file, shared with the Mac app
+        public static readonly string Build = System.Reflection.Assembly.GetExecutingAssembly()
             .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
-            .OfType<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "Build")?.Value, out var b) ? b : 0;
+            .OfType<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "Build")?.Value ?? "?";
 
         public MainForm()
         {
             SuspendLayout();
-            Text = $"ChurchSound (Windows build {Build})";
+            Text = $"ChurchSound (Windows version {Build})";
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
             ClientSize = new Size(1100, 760);
             MinimumSize = new Size(900, 620);

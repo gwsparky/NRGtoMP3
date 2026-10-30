@@ -25,7 +25,7 @@ be created from a cloud session.
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
 ### Windows app files
-- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the build number shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Bump `BUILD` with every build George tests, so the Mac and Windows numbers match (currently **30**).
+- `App.cs`: entry point, main window and tabs, `Settings` (`%APPDATA%\NRG to MP3\settings.json`), `Dpi` scaling, background-colour bar. `MainForm.Build` is the version shown in the title bar, read from the root **`BUILD`** file, which the Mac app shows too (via `CFBundleVersion` in `build-app.sh`). Versions are dates: `26.10.30`, then `26.10.30 V2`, `V3`… for more that day. Run `./bump-version.sh` before every build George tests, so Mac and Windows match.
 - `Theme.cs`: optional background colour, applied to every control.
 - `Disc.cs`: `DiscItem` (an opened image: songs, names, ticks, MusicBrainz TOC, names files) and `Audio.ReadSong` / `Audio.CombineSongs`. **Cross-platform**, so it can be tested on any OS.
 - `ConvertTab.cs`: Convert tab (disc list, song grid, preview, Play All, merge + `MergeNamesForm`, names files, export).
@@ -111,6 +111,6 @@ The app is called **ChurchSound** (renamed in build 30). Only what George sees c
 
 ## Working with George
 
-- Every build he tests: bump the number in `BUILD` (both apps use it), rebuild **both** `win-x64` and `win-arm64` if he's using the VM too, and tell him exactly where the `.exe` is and what to try.
+- Every build he tests: run `./bump-version.sh` (both apps use `BUILD`), rebuild **both** `win-x64` and `win-arm64` if he's using the VM too, and tell him exactly where the `.exe` is and what to try.
 - Test what you can headlessly first. `Disc.cs`, `SongCore.cs`, `PlaylistCore.cs` and the shared converter run without a UI, so a small console project that includes them makes a good test harness.
 - He reports problems with screenshots; ask for the exact error text.
