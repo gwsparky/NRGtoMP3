@@ -34,7 +34,7 @@ namespace NrgToMp3Win
         readonly ComboBox channels = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 170 };
         readonly ComboBox fill = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 300 };
         readonly Label warning = new() { AutoSize = true, ForeColor = Color.DarkOrange, Margin = new Padding(3, 8, 3, 3) };
-        readonly WaveformView wave = new() { Dock = DockStyle.Top, Height = 180 };
+        readonly WaveformView wave = new() { Dock = DockStyle.Top, Height = Dpi.Fit(180, 110) };
         readonly Label waveCaption = new() { Dock = DockStyle.Top, Height = 22, ForeColor = SystemColors.GrayText };
         readonly Button play = new() { Text = "▶ Play", Width = 90 };
         readonly Button stop = new() { Text = "⏹ Stop", Width = 90 };

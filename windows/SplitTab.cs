@@ -21,7 +21,7 @@ namespace NrgToMp3Win
         readonly Label title = new() { AutoSize = true, Font = new Font("Segoe UI", 11f, FontStyle.Bold), Margin = new Padding(3, 6, 3, 3) };
         readonly Button openButton = new() { Text = "Open Song…", AutoSize = true }, closeButton = new() { Text = "Close", AutoSize = true, Visible = false };
         readonly Button listButton = new() { Text = "◀ Song List", AutoSize = true, Visible = false };
-        readonly WaveformView wave = new() { Dock = DockStyle.Top, Height = 200, Markers = new() };
+        readonly WaveformView wave = new() { Dock = DockStyle.Top, Height = Dpi.Fit(200, 120), Markers = new() };
         readonly Button play = new() { Text = "▶ Play", Width = 90 };
         readonly Label time = new() { AutoSize = true, Font = new Font("Segoe UI", 12f), Margin = new Padding(8, 4, 8, 3) };
         readonly CheckBox stereo = new() { Text = "Show L / R", AutoSize = true, Margin = new Padding(3, 8, 3, 3) };

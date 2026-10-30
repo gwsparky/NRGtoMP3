@@ -143,7 +143,7 @@ namespace NrgToMp3Win
             nameRow.Controls.AddRange(new Control[] { Gray("Name the ticked tracks:"), groupName, applyName });
             var viewBox = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 4, 0, 4) };
             viewBox.Controls.Add(view);
-            var joinedPanel = new Panel { Dock = DockStyle.Bottom, Height = 250 };
+            var joinedPanel = new Panel { Dock = DockStyle.Bottom, Height = Dpi.Fit(250, 180) };
             joinedPanel.Controls.Add(viewBox); joinedPanel.Controls.Add(joinedHeader); joinedPanel.Controls.Add(nameRow);
 
             content.Controls.Add(listPanel); content.Controls.Add(noteRow); content.Controls.Add(namesRow); content.Controls.Add(joinedPanel);

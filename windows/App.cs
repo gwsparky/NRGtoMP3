@@ -74,6 +74,13 @@ namespace NrgToMp3Win
     /// by itself; this grows every size and position by the same amount (e.g. 2x at 200%), once, when a window opens.</summary>
     static class Dpi
     {
+        static readonly float screenDpi = Read();
+        static float Read() { using var g = Graphics.FromHwnd(IntPtr.Zero); return g.DpiY; }
+        /// <summary>True on short screens (1366 x 768, or 1920 x 1080 with large Windows scaling): tall panels shrink to leave room for the lists.</summary>
+        public static bool Compact => Screen.PrimaryScreen.WorkingArea.Height * 96f / screenDpi < 800;
+        /// <summary>A panel height, smaller on short screens.</summary>
+        public static int Fit(int normal, int compact) => Compact ? compact : normal;
+
         public static void Scale(Form form)
         {
             form.AutoScaleMode = AutoScaleMode.None;
@@ -98,7 +105,7 @@ namespace NrgToMp3Win
             Text = $"ChurchSound (Windows version {Build})";
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
             ClientSize = new Size(1100, 760);
-            MinimumSize = new Size(900, 620);
+            MinimumSize = new Size(800, 520);
             StartPosition = FormStartPosition.CenterScreen;
             Font = new Font("Segoe UI", 9.5f);
 
@@ -145,13 +152,17 @@ namespace NrgToMp3Win
             ResumeLayout(false);
             Load += (_, _) =>
             {
-                // after scaling, the window may be bigger than the screen: fit it, or fill the screen
+                // small screens get the whole screen; bigger ones (1920 x 1080) a roomy centred window
                 var area = Screen.FromControl(this).WorkingArea;
-                if (Width > area.Width || Height > area.Height)
+                if (Dpi.Compact || area.Width * 96f / DeviceDpi < 1300)
                 {
-                    Size = new Size(Math.Min(Width, area.Width), Math.Min(Height, area.Height));
                     Location = area.Location;
-                    if (Width >= area.Width * 0.95) WindowState = FormWindowState.Maximized;
+                    WindowState = FormWindowState.Maximized;
+                }
+                else
+                {
+                    Size = new Size(area.Width * 85 / 100, area.Height * 88 / 100);
+                    Location = new Point(area.X + (area.Width - Width) / 2, area.Y + (area.Height - Height) / 2);
                 }
             };
         }
