@@ -429,7 +429,24 @@ struct RootView: View {
     var background: Color? { Color(hex: backgroundHex) }
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        VStack(spacing: 0) {
+            // its own row above the tabs, so it never sits on top of a tab's controls
+            HStack(spacing: 6) {
+                Spacer()
+                Toggle("Number song names", isOn: $numberNames)
+                    .help("Put the track number in front of each song name (\"07 - Amazing Grace\") in exported tags, burned CD-Text and copied CD images, so songs with the same name can be told apart")
+                    .padding(.trailing, 10)
+                ColorPicker("Background", selection: Binding(
+                    get: { background ?? Color(nsColor: .windowBackgroundColor) },
+                    set: { backgroundHex = $0.hex }
+                ), supportsOpacity: false)
+                if background != nil {
+                    Button("Default") { backgroundHex = "" }.controlSize(.small)
+                }
+            }
+            .font(.caption)
+            .padding(.horizontal, 16).padding(.top, 8).frame(minHeight: 30)
+
             TabView(selection: $tab) {
                 ConvertTab(c: c, burn: burn, player: player) { tab = 1 }
                     .tabItem { Label("Convert", systemImage: "opticaldisc") }.tag(0)
@@ -447,21 +464,6 @@ struct RootView: View {
                     .tabItem { Label("Copy CD", systemImage: "square.and.arrow.down.on.square") }.tag(2)
             }
             .padding(.top, 6)
-
-            HStack(spacing: 6) {
-                Toggle("Number song names", isOn: $numberNames)
-                    .help("Put the track number in front of each song name (\"07 - Amazing Grace\") in exported tags, burned CD-Text and copied CD images, so songs with the same name can be told apart")
-                    .padding(.trailing, 10)
-                ColorPicker("Background", selection: Binding(
-                    get: { background ?? Color(nsColor: .windowBackgroundColor) },
-                    set: { backgroundHex = $0.hex }
-                ), supportsOpacity: false)
-                if background != nil {
-                    Button("Default") { backgroundHex = "" }.controlSize(.small)
-                }
-            }
-            .font(.caption)
-            .padding(.trailing, 16).padding(.top, 8)
         }
         .background((background ?? Color(nsColor: .windowBackgroundColor)).ignoresSafeArea())
         // dark background → light text, and the other way round, so everything stays readable
