@@ -1,0 +1,30 @@
+# Song names for Mary Did You Know A Ready to Sing Christmas Listening.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: RTS Mary Did You Know
+Artist: Brentwood-Benson Music Publishing
+1. Tidings of Great Joy Overture
+2. Glory to the Newborn King Medley
+3. Born to Save Us
+4. Manger Throne Medley
+5. One King
+6. Who Would Imagine a King
+7. Mary Did You Know
+8. Jesus, Messiah
+9. Great Joy Finale
+10. Leader
+11. Laborer
+12. Glory to the Newborn King Medley
+13. Widow
+14. Born to Save Us
+15. Business Person
+16. Manger Throne Medley
+17. Scientist
+18. One King
+19. Dad
+20. Who Would Imagine a King
+21. Mom
+22. Mary Did You Know
+23. Child
+24. Jesus, Messiah
+25. Group readings
+26. Great Joy Finale
