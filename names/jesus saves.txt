@@ -1,0 +1,12 @@
+# Song names for jesus saves.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Jesus Saves
+1. Jesus Saves Track 01
+2. Jesus Saves Track 02
+3. Jesus Saves Track 03
+4. Jesus Saves Track 04
+5. Jesus Saves Track 05
+6. Jesus Saves Track 06
+7. Jesus Saves Track 07
+8. Jesus Saves Track 08
+9. Jesus Saves Performance Track 09
