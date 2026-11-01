@@ -1,0 +1,25 @@
+# Song names for MercyTree.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Mercy Tree
+Artist: LifeWay Worship
+1. Mercy Tree - SPLIT TRACK
+2. Mercy Tree - SPLIT TRACK m.21
+3. Mercy Tree - SPLIT TRACK m.30
+4. Mercy Tree - SPLIT TRACK m.39
+5. Mercy Tree - SPLIT TRACK m.49
+6. Mercy Tree - SPLIT TRACK m.58
+7. Mercy Tree - SPLIT TRACK m.67
+8. Mercy Tree - SPLIT TRACK m.85
+9. Mercy Tree - SPLIT TRACK m.94
+10. Mercy Tree - SPLIT TRACK m.102-2
+11. Mercy Tree - STEREO TRACK
+12. Mercy Tree - STEREO TRACK m.21
+13. Mercy Tree - STEREO TRACK m.30
+14. Mercy Tree - STEREO TRACK m.39
+15. Mercy Tree - STEREO TRACK m.49
+16. Mercy Tree - STEREO TRACK m.58
+17. Mercy Tree - STEREO TRACK m.67
+18. Mercy Tree - STEREO TRACK m.85
+19. Mercy Tree - STEREO TRACK m.94
+20. Mercy Tree - STEREO TRACK m.102-2
+21. Mercy Tree - DEMO
