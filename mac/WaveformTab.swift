@@ -4,8 +4,8 @@ import UniformTypeIdentifiers
 import AppKit
 
 /// Waveform Viewer: look at and listen to the songs of a disc image or CD, tick neighbouring tracks to see and hear
-/// them joined as one waveform (for discs where one song is spread over several tracks), and fix and save the names.
-/// It never writes audio files, so pressing Return here can't start an export by accident.
+/// them joined as one waveform (for discs where one song is spread over several tracks), fix and save the names,
+/// and save them as one MP3 or WAV. Saving always goes through a button and a save window, so Return can't start it by accident.
 final class WaveTabState: ObservableObject {
     enum Audio { case image(URL, swap: Bool), cd([Int: URL]) }
 
@@ -17,6 +17,7 @@ final class WaveTabState: ObservableObject {
     @Published var combinedSeconds: Double = 0
     @Published var building = false
     @Published var status = ""
+    @Published var saving = false
     var audio: Audio?
     private let loader = Converter()
     private var peakJob = UUID()
@@ -150,6 +151,54 @@ final class WaveTabState: ObservableObject {
         return (out, starts)
     }
 
+    /// The name offered when saving: the first ticked track's, without any "(part 1 of 3)".
+    func suggestedName(_ typed: String) -> String {
+        let t = typed.trimmingCharacters(in: .whitespaces)
+        if !t.isEmpty { return t }
+        guard let d = disc, let first = chosen.first else { return "Joined tracks" }
+        return d.name(first).replacingOccurrences(of: #"\s*\(part \d+ of \d+\)$"#, with: "", options: .regularExpression)
+    }
+
+    /// Saves the ticked tracks joined end to end as one file. The converter writes it into a temporary folder
+    /// (with the same tags as any export), then it's moved to the place chosen in the save window.
+    func saveJoined(to dest: URL, wav: Bool) {
+        guard let d = disc else { return }
+        let tracks = chosen
+        let name = dest.deletingPathExtension().lastPathComponent
+        let album = d.album.isEmpty ? name : d.album, artist = d.artist
+        let fm = FileManager.default
+        let temp = fm.temporaryDirectory.appendingPathComponent("joined-\(UUID().uuidString)")
+        saving = true
+        status = "Reading \(tracks.count) track(s)…"
+        func finish(_ message: String) { saving = false; status = message; try? fm.removeItem(at: temp) }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let pcm = self.joined(tracks).0
+            let raw = temp.appendingPathComponent("joined.pcm"), out = temp.appendingPathComponent("out")
+            do {
+                try fm.createDirectory(at: out, withIntermediateDirectories: true)
+                try pcm.write(to: raw)
+            } catch {
+                DispatchQueue.main.async { finish("Couldn't save: \(error.localizedDescription)") }
+                return
+            }
+            let song = BurnItem(title: name, source: .raw(raw, offset: 0, length: Int64(pcm.count)), seconds: Double(pcm.count) / (44100 * 4))
+            DispatchQueue.main.async {
+                exportSongs([song], album: album, artist: artist.isEmpty ? nil : artist, to: out, wav: wav, reveal: false,
+                            onStatus: { self.status = $0 }, onLog: { _ in }) { ok in
+                    let made = fm.enumerator(at: out, includingPropertiesForKeys: nil)?.compactMap { $0 as? URL }
+                        .first { $0.pathExtension.lowercased() == (wav ? "wav" : "mp3") }
+                    guard ok, let made else { finish("Couldn't save the file."); return }
+                    do {
+                        try? fm.removeItem(at: dest)
+                        try fm.moveItem(at: made, to: dest)
+                        NSWorkspace.shared.activateFileViewerSelecting([dest])
+                        finish("Saved \(dest.lastPathComponent).")
+                    } catch { finish("Couldn't save: \(error.localizedDescription)") }
+                }
+            }
+        }
+    }
+
     /// Gives the ticked tracks one name, numbered as parts: "Amazing Grace (part 1 of 3)".
     func nameTicked(_ name: String) {
         guard let d = disc else { return }
@@ -206,7 +255,7 @@ struct WaveTab: View {
             VStack(spacing: 8) {
                 Image(systemName: "waveform").font(.system(size: 40)).foregroundStyle(.secondary)
                 Text("Drag a .nrg or .cue disc image here, or open the CD in the drive")
-                Text("See every track's waveform, tick tracks to hear them joined, and fix the song names. Nothing is exported from this tab.")
+                Text("See every track's waveform, tick tracks to hear them joined and save them as one MP3 or WAV, and fix the song names.")
                     .font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Open Disc Image…") { chooseImage() }; Button("Open CD") { state.openCD() } }
             }
@@ -337,6 +386,12 @@ struct DiscWaves: View {
                     }
                     if playing { Button("Stop") { player.stop() } }
                     Button("Untick All") { player.stop(); state.clearTicks() }
+                    Button("Save as MP3…") { saveJoined(wav: false) }
+                        .disabled(state.building || state.saving)
+                        .help("Save the ticked tracks joined into one MP3 file")
+                    Button("Save as WAV…") { saveJoined(wav: true) }
+                        .disabled(state.building || state.saving)
+                        .help("Save the ticked tracks joined into one WAV file")
                 }
             }
             ZStack(alignment: .topLeading) {
@@ -389,6 +444,14 @@ struct DiscWaves: View {
         return Previewer.Item(id: WaveTabState.combinedID, title: title,
                               subtitle: "Tracks " + tracks.map { "\($0.number)" }.joined(separator: ", "),
                               source: .data { Previewer.wav(s.joined(tracks).0) })
+    }
+
+    func saveJoined(wav: Bool) {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = Program_clean(state.suggestedName(groupName)) + (wav ? ".wav" : ".mp3")
+        panel.allowedContentTypes = [wav ? .wav : .mp3]
+        panel.message = "The ticked tracks will be joined into this one file."
+        if panel.runModal() == .OK, let url = panel.url { state.saveJoined(to: url, wav: wav) }
     }
 
     func playPause() {

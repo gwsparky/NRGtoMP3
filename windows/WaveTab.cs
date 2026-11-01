@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NrgToMp3;
@@ -12,8 +13,8 @@ using NrgToMp3;
 namespace NrgToMp3Win
 {
     /// <summary>Waveform Viewer: look at and listen to the songs of a disc image or CD, tick neighbouring tracks to see and
-    /// hear them joined as one waveform (for discs where one song is spread over several tracks), and fix and save the names.
-    /// It never writes audio files, so pressing Enter here can't start an export by accident.</summary>
+    /// hear them joined as one waveform (for discs where one song is spread over several tracks), fix and save the names,
+    /// and save them as one MP3 or WAV. Saving always goes through a button and a save window, so Enter can't start it by accident.</summary>
     class WaveTab : UserControl
     {
         DiscItem disc;
@@ -32,7 +33,7 @@ namespace NrgToMp3Win
         {
             Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 11f), ForeColor = SystemColors.GrayText,
             Text = "Drag a .nrg or .cue disc image here, or click Open CD for the music CD in the drive.\n\n"
-                 + "See every track's waveform, tick tracks to hear them joined, and fix the song names.\nNothing is exported from this tab.",
+                 + "See every track's waveform, tick tracks to hear them joined and save them as one MP3 or WAV, and fix the song names.",
         };
         readonly Panel content = new() { Dock = DockStyle.Fill, Visible = false };
         readonly TextBox album = new() { Width = 260, PlaceholderText = "Album" }, artist = new() { Width = 200, PlaceholderText = "Artist" };
@@ -48,6 +49,9 @@ namespace NrgToMp3Win
         readonly Button playJoined = new() { Text = "▶ Play Joined", AutoSize = true, Enabled = false };
         readonly Button stop = new() { Text = "■ Stop", AutoSize = true };
         readonly Button untick = new() { Text = "Untick All", AutoSize = true };
+        readonly Button saveMp3 = new() { Text = "Save as MP3…", AutoSize = true, Enabled = false };
+        readonly Button saveWav = new() { Text = "Save as WAV…", AutoSize = true, Enabled = false };
+        bool saving;
         readonly JoinedView view = new() { Dock = DockStyle.Fill };
         readonly TextBox groupName = new() { Width = 280, PlaceholderText = "Song name" };
         readonly Label status = new() { Dock = DockStyle.Bottom, AutoSize = true, Padding = new Padding(0, 6, 0, 0) };
@@ -132,13 +136,17 @@ namespace NrgToMp3Win
                 if (loaded != "joined") { player.Load(joined); loaded = "joined"; }
                 player.Play(t);
             };
+            saveMp3.Click += (_, _) => SaveJoined(false);
+            saveWav.Click += (_, _) => SaveJoined(true);
+            tips.SetToolTip(saveMp3, "Save the ticked tracks joined into one MP3 file");
+            tips.SetToolTip(saveWav, "Save the ticked tracks joined into one WAV file");
             var applyName = new Button { Text = "Apply Name", AutoSize = true };
             applyName.Click += (_, _) => NameTicked();
             groupName.KeyDown += (_, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; NameTicked(); } };
             tips.SetToolTip(applyName, "Give the ticked tracks this name, numbered as parts: “Amazing Grace (part 1 of 3)” and so on; then Save Names");
             tips.SetToolTip(view, "Orange lines show where each track starts. Click to play from that point.");
             var joinedHeader = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            joinedHeader.Controls.AddRange(new Control[] { joinedInfo, playJoined, stop, untick });
+            joinedHeader.Controls.AddRange(new Control[] { joinedInfo, playJoined, stop, untick, saveMp3, saveWav });
             var nameRow = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
             nameRow.Controls.AddRange(new Control[] { Gray("Name the ticked tracks:"), groupName, applyName });
             var viewBox = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 4, 0, 4) };
@@ -317,7 +325,7 @@ namespace NrgToMp3Win
             var d = disc;
             int job = ++joinJob;
             if (loaded == "joined") { player.Load(null); loaded = null; }
-            joined = null; playJoined.Enabled = false;
+            joined = null; playJoined.Enabled = false; UpdateSaveButtons();
             view.LeftPeaks = view.RightPeaks = Array.Empty<float>(); view.Bounds2 = new(); view.Duration = 1; view.Invalidate();
             if (tracks.Count == 0) { joinedInfo.Text = "Tick tracks above to see them joined as one waveform."; return; }
             joinedInfo.Text = $"{Describe(tracks)} · reading…";
@@ -340,10 +348,53 @@ namespace NrgToMp3Win
                     joined = all; bounds = starts;
                     view.LeftPeaks = l; view.RightPeaks = r; view.Bounds2 = starts; view.Duration = Math.Max(0.01, SongCore.Seconds(all));
                     view.Invalidate();
-                    playJoined.Enabled = true;
+                    playJoined.Enabled = true; UpdateSaveButtons();
                     joinedInfo.Text = $"{Describe(tracks)} · {SongCore.Short(SongCore.Seconds(all))}" + (HasHoles(tracks) ? "   (not next to each other on the disc)" : "");
                 });
             }).ContinueWith(t => { if (t.IsFaulted) BeginInvoke(() => { if (job == joinJob) joinedInfo.Text = "Couldn't read the tracks: " + t.Exception?.InnerException?.Message; }); });
+        }
+
+        void UpdateSaveButtons() => saveMp3.Enabled = saveWav.Enabled = joined != null && !saving;
+
+        /// <summary>The name offered when saving: the first ticked track's, without any "(part 1 of 3)".</summary>
+        string SuggestedName()
+        {
+            if (groupName.Text.Trim() != "") return groupName.Text.Trim();
+            return Regex.Replace(disc.Name(Chosen[0]), @"\s*\(part \d+ of \d+\)$", "");
+        }
+
+        /// <summary>Saves the ticked tracks joined end to end as one file. The converter writes it into a temporary
+        /// folder (with the same tags as any export), then it's moved to the place chosen in the save window.</summary>
+        void SaveJoined(bool wav)
+        {
+            if (joined == null) return;
+            EndEdit();
+            string ext = wav ? ".wav" : ".mp3";
+            using var f = new SaveFileDialog { FileName = Program.Clean(SuggestedName()) + ext, Filter = wav ? "WAV files (*.wav)|*.wav" : "MP3 files (*.mp3)|*.mp3", Title = "Save the ticked tracks as one file" };
+            if (f.ShowDialog(this) != DialogResult.OK) return;
+            string dest = f.FileName, name = Path.GetFileNameWithoutExtension(dest);
+            string albumName = string.IsNullOrWhiteSpace(disc.Album) ? name : disc.Album, artistName = string.IsNullOrWhiteSpace(disc.Artist) ? null : disc.Artist;
+            var pcm = joined;
+            saving = true; UpdateSaveButtons();
+            status.Text = $"Saving {Path.GetFileName(dest)}…";
+            Task.Run(() =>
+            {
+                string temp = Path.Combine(Path.GetTempPath(), "nrg-joined-" + Guid.NewGuid().ToString("N"));
+                try
+                {
+                    SongCore.Export(new[] { (name, pcm) }, albumName, temp, wav, false, artistName);
+                    var made = Directory.GetFiles(temp, "*" + ext, SearchOption.AllDirectories).FirstOrDefault()
+                               ?? throw new IOException("the converter made no file");
+                    File.Move(made, dest, true);
+                }
+                finally { try { Directory.Delete(temp, true); } catch { } }
+            }).ContinueWith(t => BeginInvoke(() =>
+            {
+                saving = false; UpdateSaveButtons();
+                if (t.IsFaulted) { status.Text = "Couldn't save: " + t.Exception?.InnerException?.Message; return; }
+                status.Text = $"Saved {dest}";
+                try { System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{dest}\""); } catch { }
+            }));
         }
 
         static string Describe(List<Nrg.Track> t) => t.Count == 1 ? $"Track {t[0].Number}" : "Tracks " + string.Join(", ", t.Select(x => x.Number));

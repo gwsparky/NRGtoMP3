@@ -155,7 +155,7 @@ namespace NrgToMp3Win
 
         /// <summary>Saves songs as MP3 or WAV files with names and tags, in a folder named after <paramref name="album"/>
         /// inside <paramref name="folder"/>, using the same converter as the Convert tab. Runs on the calling thread.</summary>
-        public static void Export(IList<(string title, byte[] pcm)> songs, string album, string folder, bool wav, bool numberNames)
+        public static void Export(IList<(string title, byte[] pcm)> songs, string album, string folder, bool wav, bool numberNames, string artist = null)
         {
             lock (ConsoleLock)
             {
@@ -191,6 +191,7 @@ namespace NrgToMp3Win
                     Program.meta = new Program.Meta
                     {
                         album = album,
+                        artist = artist,
                         numbered = numbered || songs.Count == 1,      // a single song needs no "01 - " in its file name
                         titles = songs.Select((s, i) => (i, s.title))
                                       .ToDictionary(x => (x.i + 1).ToString(), x => numbered ? $"{x.i + 1:00} - {x.title}" : x.title),

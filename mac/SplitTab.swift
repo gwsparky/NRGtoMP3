@@ -23,7 +23,7 @@ func listImage(_ url: URL, completion: @escaping (ListResult?) -> Void) {
 /// Saves songs as MP3 or WAV files with names and tags, in a folder named after `album` inside `folder`.
 /// The songs are written as a temporary CUE/BIN disc image, which the bundled converter turns into files.
 /// Callbacks arrive on the main thread.
-func exportSongs(_ songs: [BurnItem], album: String, to folder: URL, wav: Bool,
+func exportSongs(_ songs: [BurnItem], album: String, artist: String? = nil, to folder: URL, wav: Bool, reveal: Bool = true,
                  onStatus: @escaping (String) -> Void, onLog: @escaping (String) -> Void, done: @escaping (Bool) -> Void) {
     guard let tool = Bundle.main.url(forResource: "NrgToMp3", withExtension: nil) else { done(false); return }
     let safe = String(album.map { "/:".contains($0) ? "-" : $0 })
@@ -46,9 +46,10 @@ func exportSongs(_ songs: [BurnItem], album: String, to folder: URL, wav: Bool,
             let numbered = UserDefaults.standard.bool(forKey: "numberNames") && songs.count > 1
             // "numbered" tells the converter the names need no "01 - " in front: true when they already have
             // one, and for a single song, which needs no number at all
-            let meta: [String: Any] = ["album": album, "numbered": numbered || songs.count == 1,
+            var meta: [String: Any] = ["album": album, "numbered": numbered || songs.count == 1,
                 "titles": Dictionary(uniqueKeysWithValues: songs.enumerated().map {
                     (String($0.offset + 1), numbered ? numberedName($0.offset + 1, $0.element.title) : $0.element.title) })]
+            if let artist { meta["artist"] = artist }
             let metaURL = temp.appendingPathComponent("names.json")
             try JSONSerialization.data(withJSONObject: meta).write(to: metaURL)
 
@@ -69,7 +70,7 @@ func exportSongs(_ songs: [BurnItem], album: String, to folder: URL, wav: Bool,
             pipe.fileHandleForReading.readabilityHandler = nil
             let ok = p.terminationStatus == 0
             DispatchQueue.main.async {
-                if ok { NSWorkspace.shared.open(folder) }
+                if ok && reveal { NSWorkspace.shared.open(folder) }
                 done(ok)
             }
         } catch {
