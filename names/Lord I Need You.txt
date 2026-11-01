@@ -1,0 +1,14 @@
+# Song names for Lord I Need You.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Lord I Need You
+1. Lord I Need You Track 01
+2. Lord I Need You Track 02
+3. Lord I Need You Track 03
+4. Lord I Need You Track 04
+5. Lord I Need You Track 05
+6. Lord I Need You Track 06
+7. Lord I Need You Track 07
+8. Lord I Need You Track 08
+9. Lord I Need You Track 09
+10. Lord I Need You Track 10
+11. Lord I Need You Performance Track 11
