@@ -1,0 +1,102 @@
+# Song names for Mary Did You Know Accomp.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Mary Did You Know Accomp
+1. Tidings of Great Joy Overture  01
+2. Tidings of Great Joy Overture  02
+3. Tidings of Great Joy Overture  03
+4. Tidings of Great Joy Overture  04
+5. Tidings of Great Joy Overture  05
+6. Glory to the New Born King Medley  06
+7. Glory to the New Born King Medley  07
+8. Glory to the New Born King Medley  08
+9. Glory to the New Born King Medley  09
+10. Glory to the New Born King Medley  10
+11. Glory to the New Born King Medley  11
+12. Glory to the New Born King Medley  12
+13. Glory to the New Born King Medley  13
+14. Glory to the New Born King Medley  14
+15. Born to Save Us  15
+16. Born to Save Us  16
+17. Born to Save Us  17
+18. Born to Save Us  18
+19. Born to Save Us  19
+20. Born to Save Us  20
+21. Born to Save Us  21
+22. Born to Save Us  22
+23. Born to Save Us  23
+24. Born to Save Us  24
+25. Born to Save Us  25
+26. Born to Save Us  26
+27. Manger Throne Medley  27
+28. Manger Throne Medley  28
+29. Manger Throne Medley  29
+30. Manger Throne Medley  30
+31. Manger Throne Medley  31
+32. Manger Throne Medley  32
+33. Manger Throne Medley  33
+34. Manger Throne Medley  34
+35. Manger Throne Medley  35
+36. Manger Throne Medley  36
+37. Manger Throne Medley  37
+38. One King  38
+39. One King  39
+40. One King  40
+41. One King  41
+42. One King  42
+43. One King  43
+44. One King  44
+45. One King  45
+46. One King  46
+47. One King  47
+48. One King  48
+49. One King  49
+50. One King  50
+51. Who Would Imagine a King  51
+52. Who Would Imagine a King  52
+53. Who Would Imagine a King  53
+54. Who Would Imagine a King  54
+55. Who Would Imagine a King  55
+56. Who Would Imagine a King  56
+57. Who Would Imagine a King  57
+58. Mary Did You Know  58
+59. Mary Did You Know  59
+60. Mary Did You Know  60
+61. Mary Did You Know  61
+62. Mary Did You Know  62
+63. Mary Did You Know  63
+64. Mary Did You Know  64
+65. Mary Did You Know  65
+66. Mary Did You Know  66
+67. Mary Did You Know  67
+68. Mary Did You Know  68
+69. Jesus Messiah  69
+70. Jesus Messiah  70
+71. Jesus Messiah  71
+72. Jesus Messiah  72
+73. Jesus Messiah  73
+74. Jesus Messiah  74
+75. Jesus Messiah  75
+76. Jesus Messiah  76
+77. Jesus Messiah  77
+78. Jesus Messiah  78
+79. Jesus Messiah  79
+80. Great Joy Medley  80
+81. Great Joy Medley  81
+82. Great Joy Medley  82
+83. Great Joy Medley  83
+84. Great Joy Medley  84
+85. Great Joy Medley  85
+86. Great Joy Medley  86
+87. Great Joy Medley  87
+88. Great Joy Medley  88
+89. Great Joy Medley  89
+90. Great Joy Medley  90
+91. Tidings of Great Joy Overture With Narriation  91
+92. Glory to the New Born King Medley With Narriation  92
+93. Born to Save Us With Narriation  93
+94. Manger Throne Medley With Narriation  94
+95. One King With Narriation With Narriation  95
+96. Who Would Imagine a King With Narriation  96
+97. Mary Did You Know With Narriation  97
+98. Jesus Messiah With Narriation  98
+99. Great Joy Medley With Narriation  99
