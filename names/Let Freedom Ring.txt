@@ -1,0 +1,19 @@
+# Song names for Let Freedom Ring.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Let Freedom Ring
+1. Let Freedom Ring Track 01
+2. Let Freedom Ring Track 02
+3. Let Freedom Ring Track 03
+4. Let Freedom Ring Track 04
+5. Let Freedom Ring Track 05
+6. Let Freedom Ring Track 06
+7. Let Freedom Ring Track 07
+8. Let Freedom Ring Track 08
+9. Let Freedom Ring Track 09
+10. Let Freedom Ring Performance Track 10
+11. Track 11
+12. Track 12
+13. Track 13
+14. Track 14
+15. Track 15
+16. Track 16
