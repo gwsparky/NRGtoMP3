@@ -1,0 +1,6 @@
+# Song names for Noel.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Noel
+Artist: noe
+1. noel-full-performance
+2. noel-accompaniment-only
