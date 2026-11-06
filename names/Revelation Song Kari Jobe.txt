@@ -1,0 +1,8 @@
+# Song names for Revelation Song Kari Jobe.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Revelation Song Kari Jobe
+1. Revelation Song Kari Jobe Demo Track 01
+2. Revelation Song Kari Jobe w/bgv Track 02
+3. Revelation Song Kari Jobe wo/bgv High Track 03
+4. Revelation Song Kari Jobe wo/bgv medium Track 04
+5. Revelation Song Kari Jobe wo/bgv lowTrack 05
