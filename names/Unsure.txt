@@ -1,0 +1,9 @@
+# Song names for Unsure.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Unsure
+1. He is King Track 01
+2. He is on his Thrown Track 02
+3. Wisdom Track 03
+4. The Lord is WisdomTrack 04
+5. Fear Not Track 05
+6. His love is Eternal Track 06
