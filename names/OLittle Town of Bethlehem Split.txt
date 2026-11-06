@@ -1,0 +1,102 @@
+# Song names for OLittle Town of Bethlehem Split.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: RTS O Little Town of Bethlehem Split Tracks
+Artist: Brentwood-Benson
+1. verture: O Come, All Ye Faithful Split Track  01
+2. verture: O Come, All Ye Faithful Split Track  02
+3. verture: O Come, All Ye Faithful Split Track  03
+4. verture: O Come, All Ye Faithful Split Track  04
+5. verture: O Come, All Ye Faithful Split Track  05
+6. verture: O Come, All Ye Faithful Split Track  06
+7. verture: O Come, All Ye Faithful Split Track  07
+8. verture: O Come, All Ye Faithful Split Track  08
+9. verture: O Come, All Ye Faithful Split Track  09
+10. verture: O Come, All Ye Faithful Split Track  10
+11. verture: O Come, All Ye Faithful Split Track  11
+12. verture: O Come, All Ye Faithful Split Track  12
+13. verture: O Come, All Ye Faithful Split Track  13
+14. O Little Town (The Glory of Christmas) Split Track  14
+15. O Little Town (The Glory of Christmas) Split Track  15
+16. O Little Town (The Glory of Christmas) Split Track  16
+17. O Little Town (The Glory of Christmas) Split Track  17
+18. O Little Town (The Glory of Christmas) Split Track  18
+19. O Little Town (The Glory of Christmas) Split Track  19
+20. O Little Town (The Glory of Christmas) Split Track  20
+21. O Little Town (The Glory of Christmas) Split Track  21
+22. O Little Town (The Glory of Christmas) Split Track  22
+23. O Little Town (The Glory of Christmas) Split Track  23
+24. Journey Medley Split Track  24
+25. Journey Medley Split Track  25
+26. Journey Medley Split Track  26
+27. Journey Medley Split Track  27
+28. Journey Medley Split Track  28
+29. Journey Medley Split Track  29
+30. Journey Medley Split Track  30
+31. Journey Medley Split Track  31
+32. Journey Medley Split Track  32
+33. Journey Medley Split Track  33
+34. Journey Medley Split Track  34
+35. Journey Medley Split Track  35
+36. How Far Split Track  36
+37. How Far Split Track  37
+38. How Far Split Track  38
+39. How Far Split Track  39
+40. How Far Split Track  40
+41. How Far Split Track  41
+42. How Far Split Track  42
+43. Strange Way to Save the World Split Track  43
+44. Strange Way to Save the World Split Track  44
+45. Strange Way to Save the World Split Track  45
+46. Strange Way to Save the World Split Track  46
+47. Strange Way to Save the World Split Track  47
+48. Strange Way to Save the World Split Track  48
+49. Strange Way to Save the World Split Track  49
+50. Strange Way to Save the World Split Track  50
+51. Strange Way to Save the World Split Track  51
+52. Strange Way to Save the World Split Track  52
+53. Strange Way to Save the World Split Track  53
+54. What Child Is This?  Split Track  54
+55. What Child Is This?  Split Track  55
+56. What Child Is This?  Split Track  56
+57. What Child Is This?  Split Track  57
+58. What Child Is This?  Split Track  58
+59. What Child Is This?  Split Track  59
+60. What Child Is This?  Split Track  60
+61. What Child Is This?  Split Track  61
+62. What Child Is This?  Split Track  62
+63. It's Still the Greatest Story Ever Told Split Track  63
+64. It's Still the Greatest Story Ever Told  64
+65. It's Still the Greatest Story Ever Told  65
+66. It's Still the Greatest Story Ever Told  66
+67. It's Still the Greatest Story Ever Told  67
+68. It's Still the Greatest Story Ever Told  68
+69. It's Still the Greatest Story Ever Told  69
+70. It's Still the Greatest Story Ever Told  70
+71. How Far (Part 2) Split Track  71
+72. How Far (Part 2) Split Track  72
+73. How Far (Part 2) Split Track  73
+74. How Far (Part 2) Split Track  74
+75. How Far (Part 2) Split Track  75
+76. How Far (Part 2) Split Track  76
+77. How Far (Part 2) Split Track  77
+78. Come to Bethlehem Finale Split Track  78
+79. Come to Bethlehem Finale Split Track  79
+80. Come to Bethlehem Finale Split Track  80
+81. Come to Bethlehem Finale Split Track  81
+82. Come to Bethlehem Finale Split Track  82
+83. Come to Bethlehem Finale Split Track  83
+84. Come to Bethlehem Finale Split Track  84
+85. Come to Bethlehem Finale Split Track  85
+86. Come to Bethlehem Finale Split Track  86
+87. Come to Bethlehem Finale Split Track  87
+88. Come to Bethlehem Finale Split Track  88
+89. Come to Bethlehem Finale Split Track  89
+90. verture: O Come, All Ye Faithful   90
+91. O Little Town (The Glory of Christmas)  91
+92. Journey Medley  92
+93. How Far   93
+94. Strange Way to Save the World  94
+95. What Child Is This?  95
+96. It's Still the Greatest Story Ever Told  96
+97. How Far (Part 2)  97
+98. Come to Bethlehem Finale  98
