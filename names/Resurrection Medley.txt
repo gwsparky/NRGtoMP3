@@ -1,0 +1,14 @@
+# Song names for Resurrection Medley.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Resurrection Medley
+1. Resurrection Medley Split Track 01
+2. Resurrection Medley Split Track Track 02
+3. Resurrection Medley Split Track Track 03
+4. Resurrection Medley Split Track Track 04
+5. Resurrection Medley Split Track Track 05
+6. Resurrection Medley Split Track Track 06
+7. Resurrection Medley Split Track Track 07
+8. Resurrection Medley Split Track Track 08
+9. Resurrection Medley Split Track Track 09
+10. Resurrection Medley Split Track Track 10
+11. Resurrection Medley Demo Track 11
