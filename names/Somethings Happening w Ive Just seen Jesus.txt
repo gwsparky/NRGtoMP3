@@ -1,0 +1,18 @@
+# Song names for Somethings Happening w Ive Just seen Jesus.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Somethings Happening w Ive Just seen Jesus
+1. Somethings Happening w Ive Just seen Jesus Demoek 01
+2. Somethings Happening w Ive Just seen Jesus Split Track 02
+3. Somethings Happening w Ive Just seen Jesus Split Track 03
+4. Somethings Happening w Ive Just seen Jesus Split Track 04
+5. Somethings Happening w Ive Just seen Jesus Split Track 05
+6. Somethings Happening w Ive Just seen Jesus Split Track 06
+7. Somethings Happening w Ive Just seen Jesus Split Track 07
+8. Somethings Happening w Ive Just seen Jesus Split Track 08
+9. Somethings Happening w Ive Just seen Jesus Split Track 09
+10. Somethings Happening w Ive Just seen Jesus Split Track 10
+11. Somethings Happening w Ive Just seen Jesus Split Track 11
+12. Somethings Happening w Ive Just seen Jesus Split Track 12
+13. Somethings Happening w Ive Just seen Jesus Split Track 13
+14. Somethings Happening w Ive Just seen Jesus Split Track 14
+15. Somethings Happening w Ive Just seen Jesus Split Track 15
