@@ -1,0 +1,15 @@
+# Song names for OLittle Town of Bethlehem Demo.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: RTS O Little Town of Bethlehem
+Artist: Brentwood-Benson
+1. Overture: O Come, All Ye Faithful
+2. O Little Town (The Glory of Christmas)
+3. Narration: Journey Medley
+4. Journey Medley
+5. How Far (Part 1)
+6. Strange Way to Save the World
+7. Narration: What Child Is This?
+8. What Child Is This?
+9. It's Still the Greatest Story Ever Told
+10. How Far (Part 2)
+11. Come to Bethelehem Finale
