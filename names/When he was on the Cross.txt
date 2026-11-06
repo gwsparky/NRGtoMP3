@@ -1,0 +1,5 @@
+# Song names for When he was on the Cross.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: When he was on the Cross
+1. When he was on the Cross Split Track 01
+2. When he was on the Cross Demo Track 02
