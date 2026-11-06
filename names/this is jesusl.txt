@@ -1,0 +1,6 @@
+# Song names for this is jesusl.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: This is Jesus
+Artist: LifeWay Worship
+1. This Is Jesus
+2. This Is Jesus Split
