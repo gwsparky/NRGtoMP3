@@ -1,0 +1,14 @@
+# Song names for People Like Us.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: People Like Us - anthem
+Artist: Brentwood-Benson Music Publishing
+1. People Like Us  measure 01
+2. People Like Us  measure 12
+3. People Like Us  measure 16
+4. People Like Us  measure 23
+5. People Like Us  measure 27
+6. People Like Us  measure 34
+7. People Like Us  measure 43
+8. People Like Us  measure 47
+9. People Like Us  measure 52
+10. People Like Us  demonstration
