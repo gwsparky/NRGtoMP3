@@ -1,0 +1,93 @@
+# Song names for When Love Came Down.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: When Love Came Down - Accompaniment CD
+1. Love Was Born, mm. 1-27
+2. Love Was Born, mm. 28-36
+3. Love Was Born, mm. 37-47
+4. Love Was Born, mm. 48-65
+5. Love Was Born, mm. 66-77
+6. Love Was Born, mm. 78-94
+7. Love Was Born, mm. 95-104
+8. Love Was Born, mm. 105-131
+9. Love Was Born, mm. 132-152
+10. When Love Came Down, mm. 1-23
+11. When Love Came Down, mm. 24-41
+12. When Love Came Down, mm. 42-50
+13. When Love Came Down, mm. 51-62
+14. When Love Came Down, mm. 63-71
+15. When Love Came Down, mm. 72-89
+16. When Love Came Down, mm. 90-100
+17. When Love Came Down, mm. 101-113
+18. When Love Came Down, mm. 114-122
+19. When Love Came Down, mm. 123-136
+20. So Deep : Jesus Loves Me : My Savior's Love, mm. 1-10
+21. So Deep : Jesus Loves Me : My Savior's Love, mm. 11-28
+22. So Deep : Jesus Loves Me : My Savior's Love, mm. 29-44
+23. So Deep : Jesus Loves Me : My Savior's Love, mm. 45-52
+24. So Deep : Jesus Loves Me : My Savior's Love, mm. 53-55, 48-52
+25. So Deep : Jesus Loves Me : My Savior's Love, mm. 53, 56-63
+26. Son of Love : Breathe, mm. 1-14
+27. Son of Love : Breathe, mm. 15-32
+28. Son of Love : Breathe, mm. 33-45
+29. Son of Love : Breathe, mm. 46-49, 19-32
+30. Son of Love : Breathe, mm. 33-42
+31. Son of Love : Breathe, mm. 43-44, 50-63
+32. Son of Love : Breathe, mm. 64-77
+33. Son of Love : Breathe, mm. 78-87
+34. Son of Love : Breathe, mm. 88-89, 66-77
+35. Son of Love : Breathe, mm. 78-86
+36. Son of Love : Breathe, mm. 87, 90-96
+37. Son of Love : Breathe, mm. 97-109
+38. Joy, Joy, mm. 1-13
+39. Joy, Joy, mm. 14-22
+40. Joy, Joy, mm. 23-40
+41. Joy, Joy, mm. 41-58
+42. Joy, Joy, mm. 59-76
+43. Joy, Joy, mm. 77-86
+44. Joy to the World! The Lord Is Come, mm. 1-11
+45. Joy to the World! The Lord Is Come, mm. 12-24
+46. Joy to the World! The Lord Is Come, mm. 25-41
+47. Joy to the World! The Lord Is Come, mm. 42-62
+48. So Beautiful, mm. 1-19
+49. So Beautiful, mm. 20-22, 3-19, 23-26
+50. So Beautiful, mm. 27-34
+51. So Beautiful, mm. 35-43
+52. So Beautiful, mm. 44-51
+53. So Beautiful, mm. 52-67
+54. So Beautiful, mm. 68-77
+55. So Beautiful, mm. 78-80, 72-77
+56. So Beautiful, mm. 78, 81-88
+57. So Beautiful, mm. 89-97
+58. So Beautiful, mm. 98-107
+59. So Beautiful, mm. 108-122
+60. Worthy Is the Lamb, mm. 1-9
+61. Worthy Is the Lamb, mm. 10-17
+62. Worthy Is the Lamb, mm. 18-26
+63. Worthy Is the Lamb, mm. 27-37
+64. Worthy Is the Lamb, mm. 38-40, 5-9
+65. Worthy Is the Lamb, mm. 10-17 (2)
+66. Worthy Is the Lamb, mm. 18-26 (2)
+67. Worthy Is the Lamb, mm. 27-38, 41-44
+68. Worthy Is the Lamb, mm. 45-48
+69. Worthy Is the Lamb, mm. 49-68
+70. One Christmas Eve, mm. 1-24
+71. One Christmas Eve, mm. 25-44
+72. One Christmas Eve, mm. 45-70
+73. One Christmas Eve, mm. 71-113
+74. We Are the Reason : Silent Night, Holy Night, mm. 1-7
+75. We Are the Reason : Silent Night, Holy Night, mm. 8-17
+76. We Are the Reason : Silent Night, Holy Night, mm. 18-28
+77. We Are the Reason : Silent Night, Holy Night, mm. 29-36
+78. We Are the Reason : Silent Night, Holy Night, mm. 37-38, 20-25
+79. We Are the Reason : Silent Night, Holy Night, mm. 39-44
+80. We Are the Reason : Silent Night, Holy Night, mm. 45-51
+81. We Are the Reason : Silent Night, Holy Night, mm. 52-63
+82. Because We Believe, mm. 1-21
+83. Because We Believe, mm. 22-45
+84. Because We Believe, mm. 46-61
+85. Because We Believe, mm. 62-81
+86. Because We Believe, mm. 82-97
+87. Because We Believe, mm. 98-121
+88. Because We Believe, mm. 122-150
+89. Because We Believe, mm. 151-158
+90. Because We Believe, mm. 159-189
