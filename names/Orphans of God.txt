@@ -1,0 +1,10 @@
+# Song names for Orphans of God.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Orphans of God
+1. Orphans of God Performance 01
+2. Orphans of God W/BGV  02
+3. Orphans of God W/0BGV  03
+4. Orphans of God  W/BGV  04
+5. Orphans of God WO/BGV 05
+6. Orphans of God W/BGV 06
+7. Orphans of God WO/BGV 07
