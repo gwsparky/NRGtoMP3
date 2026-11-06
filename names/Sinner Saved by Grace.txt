@@ -1,0 +1,15 @@
+# Song names for Sinner Saved by Grace.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Sinner Saved by Grace
+1. Sinner Saved by Grace Split Track 01
+2. Sinner Saved by Grace Split Track 02
+3. Sinner Saved by Grace Split Track 03
+4. Sinner Saved by Grace Split Track 04
+5. Sinner Saved by Grace Split Track 05
+6. Sinner Saved by Grace Split Track 06
+7. Sinner Saved by Grace Split Track 07
+8. Sinner Saved by Grace Split Track 08
+9. Sinner Saved by Grace Split Track 09
+10. Sinner Saved by Grace Split Track 10
+11. Sinner Saved by Grace Split Track 11
+12. Sinner Saved by Grace Demo Track 12
