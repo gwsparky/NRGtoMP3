@@ -1,0 +1,16 @@
+# Song names for Receive Our Praise with Hallelujah.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Receive Our Praise
+1. Receive Our Praise Split Bar 1
+2. Receive Our Praise Split Bar 19
+3. Receive Our Praise Split Bar 27
+4. Receive Our Praise Split Bar 33 x2
+5. Receive Our Praise Split Bar 44
+6. Receive Our Praise Split Bar 52
+7. Receive Our Praise Instrumental Bar 1
+8. Receive Our Praise Instrumental Bar 19
+9. IReceive Our Praise nstrumental Bar 27
+10. Receive Our Praise Instrumental Bar 33 x2
+11. Receive Our Praise Instrumental Bar 44
+12. Receive Our Praise Instrumental Bar 52
+13. 03 Receive Our Praise Full
