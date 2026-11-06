@@ -1,0 +1,5 @@
+# Song names for O Holy Night.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: O Holy Night
+1. O Holy Night No Voices
+2. O Holy Night Performance
