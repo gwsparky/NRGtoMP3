@@ -1,0 +1,21 @@
+# Song names for This is Your House.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: This is Your House
+1. This is Your House Track 01
+2. This is Your House Track 02
+3. This is Your House Track 03
+4. This is Your House Track 04
+5. This is Your House Track 05
+6. This is Your House Track 06
+7. This is Your House Split Track 07
+8. This is Your House Split Track 08
+9. This is Your House Split Track 09
+10. This is Your House Split Track 10
+11. This is Your House Split Track 11
+12. This is Your House Split Track 12
+13. This is Your House Track 13
+14. This is Your House Track 14
+15. This is Your House Track 15
+16. This is Your House Track 16
+17. This is Your House Track 17
+18. This is Your House Track 18
