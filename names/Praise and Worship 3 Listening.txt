@@ -1,0 +1,19 @@
+# Song names for Praise and Worship 3 Listening.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Simple Series Praise and Worship Vol. 3
+Artist: Brentwood-Benson
+1. Impossible Things
+2. Oceans
+3. Jesus
+4. Songs of the People
+5. Whom Shall I Fear
+6. What A Beautiful Name
+7. The Lion and The Lamb
+8. Holy Spirit
+9. Good Good Father
+10. Shout for Joy
+11. This I Believe Medley
+12. Worship the Great I Am
+13. Forever We Sing Medley
+14. I Will Rise
+15. Your Great Name
