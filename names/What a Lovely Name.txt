@@ -1,0 +1,5 @@
+# Song names for What a Lovely Name.cue
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: What a Lovely Name
+Artist: Various
+1. What a Lovely Name
