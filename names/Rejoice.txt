@@ -1,0 +1,25 @@
+# Song names for Rejoice.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Rejoice
+Artist: Lifeway Worship
+1. Rejoice - split track 01
+2. Rejoice - split track Track 02
+3. Rejoice - split track Track 03
+4. Rejoice - split track Track 04
+5. Rejoice - split track Track 05
+6. Rejoice - split track Track 06
+7. Rejoice - split track Track 07
+8. Rejoice - split track Track 08
+9. Rejoice - split track Track 09
+10. Rejoice - split track Track 10
+11. Rejoice - stereo track Track 11
+12. Rejoice - stereo track Track 12
+13. Rejoice - stereo track Track 13
+14. Rejoice - stereo track Track 14
+15. Rejoice - stereo track Track 15
+16. Rejoice - stereo track Track 16
+17. Rejoice - stereo track Track 17
+18. Rejoice - stereo track Track 18
+19. Rejoice - stereo track Track 19
+20. Track 20
+21. Rejoice - demo
