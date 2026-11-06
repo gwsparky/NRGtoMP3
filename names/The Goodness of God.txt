@@ -1,0 +1,34 @@
+# Song names for The Goodness of God.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Goodness of God-DTX
+Artist: Word Music & Church Resources
+1. Goodness of God-Stereo 01
+2. Goodness of God-Stereo Meas 12
+3. Goodness of God-Stereo Meas 20
+4. Goodness of God-Stereo Meas 25
+5. Goodness of God-Stereo Meas 29
+6. Goodness of God-Stereo Meas 37
+7. Goodness of God-Stereo Meas 45
+8. Goodness of God-Stereo Meas 55
+9. Goodness of God-Stereo Meas 64
+10. Goodness of God-Stereo Meas 71
+11. Goodness of God-Split Track 11
+12. Goodness of God-Split Track Meas 12
+13. Goodness of God-Split Track Meas 20
+14. Goodness of God-Split Track Meas 25
+15. Goodness of God-Split Track Meas 29
+16. Goodness of God-Split Track Meas 37
+17. Goodness of God-Split Track Meas 45
+18. Goodness of God-Split Track Meas 55
+19. Goodness of God-Split Track Meas 64
+20. Goodness of God-Split Track Meas 71
+21. Goodness of God-Choral Demo 21
+22. Goodness of God-Choral Demo Meas 12
+23. Goodness of God-Choral Demo Meas 20
+24. Goodness of God-Choral Demo Meas 25
+25. Goodness of God-Choral Demo Meas 29
+26. Goodness of God-Choral Demo Meas 37
+27. Goodness of God-Choral Demo Meas 45
+28. Goodness of God-Choral Demo Meas 55
+29. Goodness of God-Choral Demo Meas 64
+30. Goodness of God-Choral Demo Meas 71
