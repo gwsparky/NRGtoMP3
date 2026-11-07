@@ -1,11 +1,11 @@
 # Song names for My Jesus.nrg
 # One song per line: a number, then the name. Lines starting with # are ignored.
 Album: My Jesus
-1. My Jesus (Wilson) ld
-2. My Jesus (Wilson) hb
+1. My Jesus (Wilson) lowd
+2. My Jesus (Wilson) highb
 3. My Jesus (Wilson) ht
 4. My Jesus (Wilson) mb
-5. My Jesus (Wilson) mt
+5. My Jesus (Wilson) medium wt
 6. My Jesus (Wilson) lb
 7. My Jesus (Wilson) lt
 8. 6-15-21 promo
