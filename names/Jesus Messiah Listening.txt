@@ -1,0 +1,11 @@
+# Song names for Jesus Messiah Listening.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: Jesus Messiah Listening
+1. Because He Lives 01
+2. Jesus Messiah 02
+3. Blessed Redeemer 03
+4. Jesus , I Come Medley I Come Whiter than Snow  04
+5. O What Love 05
+6. Sinner Saved By Grace with Grace Greater Than Sin  06
+7. Christ is Risen He is Risen Indeed! 07
+8. Because He Lives Medley 2 08
