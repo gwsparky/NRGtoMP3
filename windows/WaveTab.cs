@@ -21,6 +21,7 @@ namespace NrgToMp3Win
         readonly Dictionary<int, float[]> peaks = new();         // small waveform of each track (left and right together)
         readonly HashSet<int> picked = new();
         byte[] joined;                                           // the ticked tracks end to end
+        byte[] heard;                                            // the same with only the chosen side, if one is chosen
         List<(int number, double at)> bounds = new();            // where each ticked track starts, in seconds
         int peakJob, joinJob;
         string loaded;                                           // what's in the player: a track number, "joined", or null
@@ -49,6 +50,7 @@ namespace NrgToMp3Win
         readonly Button playJoined = new() { Text = "▶ Play Joined", AutoSize = true, Enabled = false };
         readonly Button stop = new() { Text = "■ Stop", AutoSize = true };
         readonly Button untick = new() { Text = "Untick All", AutoSize = true };
+        readonly ComboBox side = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 130, Margin = new Padding(3, 5, 3, 3) };
         readonly Button saveMp3 = new() { Text = "Save as MP3…", AutoSize = true, Enabled = false };
         readonly Button saveWav = new() { Text = "Save as WAV…", AutoSize = true, Enabled = false };
         bool saving;
@@ -133,9 +135,18 @@ namespace NrgToMp3Win
             view.SeekRequested += t =>
             {
                 if (joined == null) return;
-                if (loaded != "joined") { player.Load(joined); loaded = "joined"; }
+                if (loaded != "joined") { player.Load(Heard); loaded = "joined"; }
                 player.Play(t);
             };
+            side.Items.AddRange(new object[] { "Both sides", "Left only", "Right only" });
+            side.SelectedIndex = 0;
+            side.SelectedIndexChanged += (_, _) =>
+            {
+                heard = null;
+                if (loaded == "joined") { player.Load(null); loaded = null; }   // the joined song changes; play it again to hear the new choice
+                view.HideLeft = side.SelectedIndex == 2; view.HideRight = side.SelectedIndex == 1; view.Invalidate();
+            };
+            tips.SetToolTip(side, "Hear and save both sides, or only the left or right one (through both speakers), e.g. the music without the singing");
             saveMp3.Click += (_, _) => SaveJoined(false);
             saveWav.Click += (_, _) => SaveJoined(true);
             tips.SetToolTip(saveMp3, "Save the ticked tracks joined into one MP3 file");
@@ -146,7 +157,7 @@ namespace NrgToMp3Win
             tips.SetToolTip(applyName, "Give the ticked tracks this name, numbered as parts: “Amazing Grace (part 1 of 3)” and so on; then Save Names");
             tips.SetToolTip(view, "Orange lines show where each track starts. Click to play from that point.");
             var joinedHeader = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            joinedHeader.Controls.AddRange(new Control[] { joinedInfo, playJoined, stop, untick, saveMp3, saveWav });
+            joinedHeader.Controls.AddRange(new Control[] { joinedInfo, playJoined, stop, side, untick, saveMp3, saveWav });
             var nameRow = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
             nameRow.Controls.AddRange(new Control[] { Gray("Name the ticked tracks:"), groupName, applyName });
             var viewBox = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 4, 0, 4) };
@@ -325,7 +336,7 @@ namespace NrgToMp3Win
             var d = disc;
             int job = ++joinJob;
             if (loaded == "joined") { player.Load(null); loaded = null; }
-            joined = null; playJoined.Enabled = false; UpdateSaveButtons();
+            joined = heard = null; playJoined.Enabled = false; UpdateSaveButtons();
             view.LeftPeaks = view.RightPeaks = Array.Empty<float>(); view.Bounds2 = new(); view.Duration = 1; view.Invalidate();
             if (tracks.Count == 0) { joinedInfo.Text = "Tick tracks above to see them joined as one waveform."; return; }
             joinedInfo.Text = $"{Describe(tracks)} · reading…";
@@ -354,13 +365,18 @@ namespace NrgToMp3Win
             }).ContinueWith(t => { if (t.IsFaulted) BeginInvoke(() => { if (job == joinJob) joinedInfo.Text = "Couldn't read the tracks: " + t.Exception?.InnerException?.Message; }); });
         }
 
+        /// <summary>What's played and saved: the joined tracks, or only the chosen side through both speakers.</summary>
+        byte[] Heard => joined == null || side.SelectedIndex == 0 ? joined
+            : heard ??= SongCore.ApplyChannels(joined, side.SelectedIndex == 1 ? SongCore.Channels.RemoveRight : SongCore.Channels.RemoveLeft, duplicate: true);
+
         void UpdateSaveButtons() => saveMp3.Enabled = saveWav.Enabled = joined != null && !saving;
 
         /// <summary>The name offered when saving: the first ticked track's, without any "(part 1 of 3)".</summary>
         string SuggestedName()
         {
             if (groupName.Text.Trim() != "") return groupName.Text.Trim();
-            return Regex.Replace(disc.Name(Chosen[0]), @"\s*\(part \d+ of \d+\)$", "");
+            var name = Regex.Replace(disc.Name(Chosen[0]), @"\s*\(part \d+ of \d+\)$", "");
+            return side.SelectedIndex switch { 1 => name + " (left side)", 2 => name + " (right side)", _ => name };
         }
 
         /// <summary>Saves the ticked tracks joined end to end as one file. The converter writes it into a temporary
@@ -374,7 +390,7 @@ namespace NrgToMp3Win
             if (f.ShowDialog(this) != DialogResult.OK) return;
             string dest = f.FileName, name = Path.GetFileNameWithoutExtension(dest);
             string albumName = string.IsNullOrWhiteSpace(disc.Album) ? name : disc.Album, artistName = string.IsNullOrWhiteSpace(disc.Artist) ? null : disc.Artist;
-            var pcm = joined;
+            var pcm = Heard;
             saving = true; UpdateSaveButtons();
             status.Text = $"Saving {Path.GetFileName(dest)}…";
             Task.Run(() =>
@@ -439,7 +455,7 @@ namespace NrgToMp3Win
         {
             if (joined == null) return;
             if (loaded == "joined" && from == 0) { player.Toggle(); return; }
-            if (loaded != "joined") { player.Load(joined); loaded = "joined"; }
+            if (loaded != "joined") { player.Load(Heard); loaded = "joined"; }
             player.Play(from);
         }
 
@@ -537,6 +553,7 @@ namespace NrgToMp3Win
         public float[] LeftPeaks = Array.Empty<float>(), RightPeaks = Array.Empty<float>();
         public List<(int number, double at)> Bounds2 = new();
         public double Duration = 1, Position = -1;
+        public bool HideLeft, HideRight;                         // the side left out ("Left only" / "Right only") is drawn empty
         public event Action<double> SeekRequested;
 
         public JoinedView() { DoubleBuffered = true; ResizeRedraw = true; BackColor = SystemColors.Window; Cursor = Cursors.Hand; }
@@ -554,7 +571,7 @@ namespace NrgToMp3Win
             for (int li = 0; li < 2; li++)
             {
                 var p = lanes[li];
-                if (p.Length == 0) continue;
+                if (p.Length == 0 || (li == 0 ? HideLeft : HideRight)) continue;
                 float bw = Width / (float)p.Length, mid = laneH * (li + 0.5f);
                 using var brush = new SolidBrush(colors[li]);
                 for (int i = 0; i < p.Length; i++)

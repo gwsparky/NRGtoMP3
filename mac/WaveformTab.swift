@@ -18,6 +18,7 @@ final class WaveTabState: ObservableObject {
     @Published var building = false
     @Published var status = ""
     @Published var saving = false
+    @Published var side = ChannelMode.both                          // hear and save both sides, or only the left or right one
     var audio: Audio?
     private let loader = Converter()
     private var peakJob = UUID()
@@ -142,13 +143,22 @@ final class WaveTabState: ObservableObject {
         }
     }
 
-    func joined(_ tracks: [TrackInfo]) -> (Data, [Int]) {
+    /// The tracks end to end; with `side` set, only that side, played through both speakers.
+    func joined(_ tracks: [TrackInfo], side: ChannelMode = .both) -> (Data, [Int]) {
         var out = Data(), starts: [Int] = []
         for t in tracks {
             starts.append(out.count)
             if let p = pcm(t) { out.append(p) }
         }
-        return (out, starts)
+        return (applyChannels(out, side, duplicate: true), starts)
+    }
+
+    var sideNote: String? {
+        switch side {
+        case .both: return nil
+        case .removeRight: return "left side"
+        case .removeLeft: return "right side"
+        }
     }
 
     /// The name offered when saving: the first ticked track's, without any "(part 1 of 3)".
@@ -156,14 +166,15 @@ final class WaveTabState: ObservableObject {
         let t = typed.trimmingCharacters(in: .whitespaces)
         if !t.isEmpty { return t }
         guard let d = disc, let first = chosen.first else { return "Joined tracks" }
-        return d.name(first).replacingOccurrences(of: #"\s*\(part \d+ of \d+\)$"#, with: "", options: .regularExpression)
+        let name = d.name(first).replacingOccurrences(of: #"\s*\(part \d+ of \d+\)$"#, with: "", options: .regularExpression)
+        return sideNote.map { "\(name) (\($0))" } ?? name
     }
 
     /// Saves the ticked tracks joined end to end as one file. The converter writes it into a temporary folder
     /// (with the same tags as any export), then it's moved to the place chosen in the save window.
     func saveJoined(to dest: URL, wav: Bool) {
         guard let d = disc else { return }
-        let tracks = chosen
+        let tracks = chosen, side = side
         let name = dest.deletingPathExtension().lastPathComponent
         let album = d.album.isEmpty ? name : d.album, artist = d.artist
         let fm = FileManager.default
@@ -172,7 +183,7 @@ final class WaveTabState: ObservableObject {
         status = "Reading \(tracks.count) track(s)…"
         func finish(_ message: String) { saving = false; status = message; try? fm.removeItem(at: temp) }
         DispatchQueue.global(qos: .userInitiated).async {
-            let pcm = self.joined(tracks).0
+            let pcm = self.joined(tracks, side: side).0
             let raw = temp.appendingPathComponent("joined.pcm"), out = temp.appendingPathComponent("out")
             do {
                 try fm.createDirectory(at: out, withIntermediateDirectories: true)
@@ -385,6 +396,16 @@ struct DiscWaves: View {
                         Label(playing && !player.paused ? "Pause" : "Play Joined", systemImage: playing && !player.paused ? "pause.fill" : "play.fill")
                     }
                     if playing { Button("Stop") { player.stop() } }
+                    Picker("", selection: Binding(get: { state.side }, set: { v in
+                        if playing { player.stop() }      // the joined song changes; start it again to hear the new choice
+                        state.side = v
+                    })) {
+                        Text("Both sides").tag(ChannelMode.both)
+                        Text("Left only").tag(ChannelMode.removeRight)
+                        Text("Right only").tag(ChannelMode.removeLeft)
+                    }
+                    .pickerStyle(.segmented).labelsHidden().frame(width: 250)
+                    .help("Hear and save both sides, or only the left or right one (through both speakers), e.g. the music without the singing")
                     Button("Untick All") { player.stop(); state.clearTicks() }
                     Button("Save as MP3…") { saveJoined(wav: false) }
                         .disabled(state.building || state.saving)
@@ -396,7 +417,9 @@ struct DiscWaves: View {
             }
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 8).fill(Color.primary.opacity(0.05))
-                WaveformCanvas(left: state.combined.left, right: state.combined.right, combined: [])
+                // the side that's left out is drawn empty
+                WaveformCanvas(left: state.side == .removeLeft ? [] : state.combined.left,
+                               right: state.side == .removeRight ? [] : state.combined.right, combined: [])
                 GeometryReader { g in
                     ForEach(Array(state.bounds.enumerated()), id: \.offset) { i, b in
                         if i > 0 {
@@ -439,11 +462,11 @@ struct DiscWaves: View {
     }
 
     func joinedItem() -> Previewer.Item {
-        let tracks = state.chosen, s = state
+        let tracks = state.chosen, s = state, side = state.side
         let title = tracks.map { disc.name($0) }.first ?? "Joined tracks"
         return Previewer.Item(id: WaveTabState.combinedID, title: title,
                               subtitle: "Tracks " + tracks.map { "\($0.number)" }.joined(separator: ", "),
-                              source: .data { Previewer.wav(s.joined(tracks).0) })
+                              source: .data { Previewer.wav(s.joined(tracks, side: side).0) })
     }
 
     func saveJoined(wav: Bool) {
