@@ -2,20 +2,20 @@
 # One song per line: a number, then the name. Lines starting with # are ignored.
 Album: Church Music
 Artist: Various
-1. I'm Gonna Wear a Crown
-2. Track 02
+1. I'm Shall Wear a Crown
+2. Alpha And Omega
 3. What a Meeting
 4. What a Lovely Name
 5. Jesus the One and Only
 6. I am Redeemed
-7. The God of My Childhood
-8. Track 08
-9. My Redeemer Lives!
-10. Easter Melody
+7. I Have Returned
+8. Glorious City OF God
+9. Redeemer
+10. Resurrection  Melody
 11. Shoutin Time
 12. God Raised the Ransom
 13. Jesus Never Fails
 14. It's Still the Cross
 15. It Is Finished
-16. Track 16
+16. The King is Coming
 17. Shout To The Lord
