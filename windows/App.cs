@@ -119,6 +119,7 @@ namespace NrgToMp3Win
             tabs.TabPages.Add(Page("Split Song", split));
             tabs.TabPages.Add(Page("Change Key", new KeyTab()));
             tabs.TabPages.Add(Page("Waveform Viewer", new WaveTab()));
+            tabs.TabPages.Add(Page("Song Words", new WordsTab()));
             Controls.Add(tabs);
             // links between tabs
             CopyTab.OpenInConvert += cue => { convert.AddFiles(new[] { cue }); tabs.SelectedIndex = 0; };

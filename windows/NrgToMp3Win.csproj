@@ -39,6 +39,14 @@
     <!-- pitch shifting for Change Key (LGPL) -->
     <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2" />
+    <!-- speech-to-text for Song Words (whisper.cpp, MIT) -->
+    <PackageReference Include="Whisper.net" Version="1.8.1" />
+    <!-- its Windows files are packed into the .exe and unpacked on first use (see WordsCore.Natives) -->
+    <PackageReference Include="Whisper.net.Runtime" Version="1.8.1" GeneratePathProperty="true" ExcludeAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(PkgWhisper_net_Runtime)/build/$(RuntimeIdentifier)/*.dll" LogicalName="whisper/%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

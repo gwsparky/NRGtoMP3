@@ -17,7 +17,7 @@ be created from a cloud session.
 |---|---|---|
 | `Nrg.cs`, `Program.cs`, `Wav.cs`, `Id3.cs` | **Shared converter**: reads `.nrg` (DAO/TAO, NER5/NERO footers, CD-Text), `.cue/.bin`, and "raw" images with no Nero track list (songs split at ≥5 s silences); exports MP3/WAV with ID3/INFO tags; `--merge`, `--list` (JSON), `--tracks`, `--meta names.json`. The Mac app runs it as a CLI; the Windows app calls `Program.Unpack` directly. | both |
 | `NrgToMp3.csproj` | builds the shared converter as the Mac CLI (`net8.0`, excludes `windows/**`) | Mac |
-| `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key, Waveform Viewer; Player and Change Key also play audio CDs with their CD-Text names via `AudioCD.swift`) | Mac |
+| `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key, Waveform Viewer, Song Words; Player and Change Key also play audio CDs with their CD-Text names via `AudioCD.swift`) | Mac |
 | `build-app.sh` | Mac build: app + `dist/ChurchSound Installer.dmg` | Mac |
 | `windows/*.cs`, `windows/NrgToMp3Win.csproj` | WinForms Windows app (`net8.0-windows`, includes the shared files above) | Windows |
 | `windows/build-windows.sh` | builds both Windows `.exe`s **from the Mac** (zsh); on Windows use the commands below | Mac |
@@ -38,6 +38,7 @@ be created from a cloud session.
 - `Burner.cs`: burning with IMAPI2 via late-bound COM (`dynamic`) on an STA thread: `MsftRawCDImageCreator` + `MsftDiscFormat2RawCD` (disc-at-once, so exact/zero gaps). Each track file is the song plus the silence before the next one. Tries each raw sector type; if all fail (George's burner gave C0AA0602 "media not prepared" in builds 14–15), `BurnTab` offers `Burner.BurnStandard` (`MsftDiscFormat2TrackAtOnce`, always 2 s gaps).
 - `BurnTab.cs`: Burn CD tab. ✂ raises `BurnTab.SplitRequested` → `SplitTab.OpenBurnItem`, whose parts replace the song.
 - `CdReader.cs` (`IOCTL_CDROM_READ_TOC` / `IOCTL_CDROM_RAW_READ`, retries then sector-by-sector) + `CopyTab.cs`: Copy CD tab.
+- `WordsCore.cs` (cross-platform: 16 kHz conversion, which side has the singing, model download, Whisper.net with **beam search**: greedy mode only hears "[MUSIC]" in songs) + `WordsTab.cs`: Song Words tab. Whisper's native DLLs are embedded in the exe (`EmbeddedResource` from `Whisper.net.Runtime`, `ExcludeAssets=all`) and unpacked to `%LOCALAPPDATA%\ChurchSound\whisper-1.8.1\runtimes\win-<arch>\`; the model (`ggml-small.en.bin`, ~490 MB) downloads to `%LOCALAPPDATA%\ChurchSound\` on first use.
 - `Install.cs`: the app installs itself ("Install on This PC…" button): copies the exe to `%LOCALAPPDATA%\Programs\ChurchSound`, Start-menu/desktop shortcuts, an uninstall entry in HKCU (`--uninstall`).
 
 ## Building
@@ -82,6 +83,9 @@ dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\window
 9. **Waveform Viewer tab** (`WaveTab.cs`): open an image or the CD, small waveform per track (click it to tick), ↕ ticks a run, joined waveform of the ticked tracks with orange track starts, Play Joined / click to play from a point, Both sides / Left only / Right only (play and save one side through both speakers), Save as MP3… / Save as WAV… (the ticked tracks as one file, via a save window), Apply Name ("Song (part 1 of 3)"), Save/Load Names, Look Up, Get from GitHub, Open in Convert Tab.
 10. **CDs as discs:** `DiscItem.FromCd` (CD-Text names via `CdReader.ReadCdText` → `IOCTL_CDROM_READ_TOC_EX` format 5, parsed by the cross-platform `CdText.cs`; songs read on demand by `DiscItem.ReadTrack`, last 3 cached). Used by **Player → Play CD**, **Change Key → Open CD** (`SongOpener.OpenCd`) and the Waveform Viewer.
 11. **Burn CD:** Look Up Names… (`LookupForm` now takes any song count/TOC/apply callback; `BurnList.Toc()` is inexact), and adding an image loads its names file and then `names/<image>.txt` from GitHub. `DiscArtist` goes into the CUE as PERFORMER.
+
+**Added in build 26.11.08 V2, not yet tried on Windows (or clicked through on the Mac):**
+12. **Song Words tab** (`mac/SongWords.swift`, `windows/WordsTab.cs`): open a song / image track / CD track, Listen to (Automatic / Both / Left / Right), Get Words, edit, Copy, Save Words… (`<song> - Words.txt`, never `<image>.txt`, which is the names file). Automatic: if the sides differ (correlation < 0.6), transcribes each side and keeps the one with more words (George's "Split" tracks: band left, singers right). The Mac runs Homebrew's `whisper-cli` (`brew install whisper-cpp`; the tab shows how if it's missing) and downloads the model to `~/Library/Application Support/ChurchSound/` (also uses `~/.whisper/`). Tested headlessly on George's test song: ~255 words from the right side on both code paths. Don't paste transcribed lyrics into chat (copyright); report word counts.
 
 **Differences from the Mac still open:**
 - Burn CD on Windows writes **no CD-Text** (song names on the disc) and has **no test burn** or speed choice. CD-Text with the raw burner needs R-W subcode packs (`IRawCDImageCreator.AddSubcodeRWGenerator`).

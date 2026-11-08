@@ -421,6 +421,7 @@ struct RootView: View {
     @StateObject private var splitter = SplitTabState()
     @StateObject private var keyChanger = KeyTabState()
     @StateObject private var waves = WaveTabState()
+    @StateObject private var words = WordsTabState()
     @StateObject private var playlist = BurnList()   // the Player tab's songs (same model as the burn list, so playlists work in both)
     @State private var tab = 0
     @AppStorage("backgroundColor") private var backgroundHex = ""
@@ -464,6 +465,8 @@ struct RootView: View {
                     .tabItem { Label("Change Key", systemImage: "music.quarternote.3") }.tag(4)
                 WaveTab(state: waves, player: player) { url in c.add([url]); tab = 0 }
                     .tabItem { Label("Waveform Viewer", systemImage: "waveform") }.tag(6)
+                WordsTab(state: words, player: player)
+                    .tabItem { Label("Song Words", systemImage: "text.quote") }.tag(7)
                 CopyTab(copier: copier, player: player) { cue in c.add([cue]); tab = 0 }
                     .tabItem { Label("Copy CD", systemImage: "square.and.arrow.down.on.square") }.tag(2)
             }
