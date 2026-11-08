@@ -1,0 +1,3 @@
+# Song names for Audio CD.cue
+# One song per line: a number, then the name. Lines starting with # are ignored.
+1. Hosanna
