@@ -422,6 +422,7 @@ struct RootView: View {
     @StateObject private var keyChanger = KeyTabState()
     @StateObject private var waves = WaveTabState()
     @StateObject private var words = WordsTabState()
+    @StateObject private var updates = UpdateChecker()
     @StateObject private var playlist = BurnList()   // the Player tab's songs (same model as the burn list, so playlists work in both)
     @State private var tab = 0
     @AppStorage("backgroundColor") private var backgroundHex = ""
@@ -448,9 +449,11 @@ struct RootView: View {
                 Text("Version \(Bundle.main.infoDictionary?["ChurchSoundVersion"] as? String ?? "?")")
                     .foregroundStyle(.secondary)
                     .padding(.leading, 14)
+                UpdateButton(updates: updates)
             }
             .font(.caption)
             .padding(.horizontal, 16).padding(.top, 8).frame(minHeight: 30)
+            .onAppear { updates.checkAutomatically() }
 
             TabView(selection: $tab) {
                 ConvertTab(c: c, burn: burn, player: player) { tab = 1 }

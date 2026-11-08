@@ -139,7 +139,28 @@ namespace NrgToMp3Win
             var bar = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft };
             // the version, in the top right corner (also in the title bar); the bar runs right to left, so it goes first
             var version = new Label { Text = $"Version {Build}", AutoSize = true, ForeColor = Color.DimGray, Margin = new Padding(14, 8, 8, 3) };
+            var update = new Button { Text = "Check for Updates", AutoSize = true };
+            string newPage = null;
+            async void Check(bool quiet)
+            {
+                update.Enabled = false; update.Text = "Checking…";
+                var (v, page, error) = await Updates.Latest(SyncSettings.Token);
+                update.Enabled = true; update.Text = "Check for Updates";
+                if (error == null) Settings.Set("lastUpdateCheck", DateTime.UtcNow.ToString("o"));
+                if (v != null && Updates.IsNewer(v, Build))
+                {
+                    newPage = page;
+                    update.Text = $"Version {v} is available: Download"; update.BackColor = Color.LightGreen;
+                    if (!quiet && MessageBox.Show(this, $"ChurchSound {v} is available (you have {Build}).\n\nOpen the download page?", "Update", MessageBoxButtons.YesNo) == DialogResult.Yes) Updates.OpenPage(page);
+                }
+                else if (!quiet) MessageBox.Show(this, error ?? $"You have the newest version ({Build}).", "Check for Updates");
+            }
+            update.Click += (_, _) => { if (newPage != null) Updates.OpenPage(newPage); else Check(false); };
+            new ToolTip().SetToolTip(update, "See if a newer ChurchSound is on GitHub");
             bar.Controls.Add(version);
+            bar.Controls.Add(update);
+            if (!DateTime.TryParse(Settings.Get("lastUpdateCheck"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var last) || DateTime.UtcNow - last > TimeSpan.FromHours(20))
+                Shown += (_, _) => Check(true);
             bar.Controls.AddRange(new Control[] { reset, pick });
             if (!Install.RunningInstalled)
             {

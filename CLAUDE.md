@@ -8,7 +8,7 @@ George is not a programmer: explain in plain language, give him clear test steps
 downloads the ZIP to build on his Mac. At the start of a session, check for other branches (`git ls-remote origin`) and ask
 whether his Mac or PC has changes that aren't on GitHub yet; in October 2026 build 17 sat unnoticed on a side branch
 (`windows-burn-copy`) while `main` was still build 13. Push finished work to `main` (he has asked for that) so the next
-session and his downloads see it. Windows `.exe`s are built in the session and sent with SendUserFile; From George's Mac, `gh release create` works (first release: v26.11.08, with the .dmg and both .exes); GitHub releases can't
+session and his downloads see it. Windows `.exe`s are built in the session and sent with SendUserFile; From George's Mac, `gh release create` works (**tag = `v` + BUILD with ` V` → `-V`**, e.g. `v26.11.08-V4`: both apps' "Check for Updates" (`mac/Updates.swift`, `windows/Updates.cs`) read the latest release's tag, at start-up at most daily and from the button next to the version, and use the saved GitHub key so it works if the repo is private) (first release: v26.11.08, with the .dmg and both .exes); GitHub releases can't
 be created from a cloud session.
 
 ## Layout
