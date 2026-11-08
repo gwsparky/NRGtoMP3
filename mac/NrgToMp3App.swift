@@ -443,6 +443,10 @@ struct RootView: View {
                 if background != nil {
                     Button("Default") { backgroundHex = "" }.controlSize(.small)
                 }
+                // the version, in the top right corner (also in the title bar)
+                Text("Version \(Bundle.main.infoDictionary?["ChurchSoundVersion"] as? String ?? "?")")
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 14)
             }
             .font(.caption)
             .padding(.horizontal, 16).padding(.top, 8).frame(minHeight: 30)

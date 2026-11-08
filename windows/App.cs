@@ -136,6 +136,9 @@ namespace NrgToMp3Win
             };
             reset.Click += (_, _) => { Theme.Set(this, null); reset.Visible = false; };
             var bar = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft };
+            // the version, in the top right corner (also in the title bar); the bar runs right to left, so it goes first
+            var version = new Label { Text = $"Version {Build}", AutoSize = true, ForeColor = Color.DimGray, Margin = new Padding(14, 8, 8, 3) };
+            bar.Controls.Add(version);
             bar.Controls.AddRange(new Control[] { reset, pick });
             if (!Install.RunningInstalled)
             {
