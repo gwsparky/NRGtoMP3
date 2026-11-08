@@ -106,7 +106,7 @@ enum Whisper {
     /// Trims the lines and drops Whisper's sound labels like "(upbeat music)" or "[MUSIC]".
     static func clean(_ text: String) -> String {
         text.split(separator: "\n", omittingEmptySubsequences: false)
-            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .map { $0.replacingOccurrences(of: "♪", with: "").replacingOccurrences(of: "♫", with: "").trimmingCharacters(in: .whitespaces) }   // no music-note marks
             .filter { line in
                 let t = line.trimmingCharacters(in: CharacterSet(charactersIn: "()[]♪ "))
                 let isLabel = (line.hasPrefix("(") && line.hasSuffix(")")) || (line.hasPrefix("[") && line.hasSuffix("]"))

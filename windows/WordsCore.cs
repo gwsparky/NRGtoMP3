@@ -63,7 +63,7 @@ namespace NrgToMp3Win
         /// <summary>Trims lines and drops Whisper's sound labels like "(upbeat music)" or "[MUSIC]".</summary>
         public static string Clean(string line)
         {
-            line = line.Trim();
+            line = line.Replace("♪", "").Replace("♫", "").Trim();   // no music-note marks
             var core = line.Trim('(', ')', '[', ']', '♪', ' ');
             bool label = (line.StartsWith("(") && line.EndsWith(")")) || (line.StartsWith("[") && line.EndsWith("]"));
             return core.Length == 0 || label ? null : line;
