@@ -162,6 +162,8 @@ struct NamesSyncSheet: View {
     @State private var on = NamesSync.on
     @State private var repo = NamesSync.repo
     @State private var token = NamesSync.token ?? ""
+    @State private var keySaved = NamesSync.token != nil
+    @State private var confirmRemove = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -174,6 +176,20 @@ struct NamesSyncSheet: View {
             Grid(alignment: .leading) {
                 GridRow { Text("Repository"); TextField(NamesSync.defaultRepo, text: $repo).textFieldStyle(.roundedBorder) }
                 GridRow { Text("Access key"); SecureField("github_pat_…", text: $token).textFieldStyle(.roundedBorder) }
+            }
+            HStack {
+                Image(systemName: keySaved ? "key.fill" : "key").foregroundStyle(.secondary)
+                Text(keySaved ? "An access key is saved on this Mac." : "No access key is saved.").font(.callout).foregroundStyle(.secondary)
+                Spacer()
+                Button("Remove Key…") { confirmRemove = true }
+                    .disabled(!keySaved && token.isEmpty)
+                    .help("Delete the saved access key from this Mac, e.g. if a wrong one was pasted")
+            }
+            .alert("Remove the saved access key?", isPresented: $confirmRemove) {
+                Button("Remove", role: .destructive) { NamesSync.token = nil; token = ""; keySaved = false }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Names will still download from GitHub. To upload them again, paste a new key here.")
             }
             HStack {
                 Spacer()
