@@ -45,6 +45,8 @@ namespace NrgToMp3Win
         public bool HasNext => queue.Count > 0 && index < queue.Count - 1;
         public bool Paused { get; private set; }
         public bool RepeatAll { get; set; }               // Player tab: start the list again after the last song
+        public bool StopAfterEach { get; set; }           // Player tab: stop at the end of each song instead of going on
+        public bool WaitingAfterSong { get; private set; } // stopped after a song (StopAfterEach); Play goes on to the next
         float volume = 1f;
         public float Volume { get => volume; set { volume = Math.Clamp(value, 0f, 1f); if (output != null) output.Volume = volume; } }
 
@@ -60,9 +62,10 @@ namespace NrgToMp3Win
         }
 
         /// <summary>Every song in order from <paramref name="from"/>, moving straight on as each one ends.</summary>
-        public void PlayAll(List<Item> items, int from = 0)
+        public void PlayAll(List<Item> items, int from = 0, bool stopAfterEach = false)
         {
             Stop();
+            StopAfterEach = stopAfterEach;
             if (from < 0 || from >= items.Count) return;
             queue = items;
             index = from;
@@ -70,6 +73,13 @@ namespace NrgToMp3Win
         }
 
         public void Next() { if (HasNext) { index++; Start(queue[index], TakeNext()); } }
+
+        /// <summary>After stopping at the end of a song: play the next one (or the first again with Repeat).</summary>
+        public void PlayNextAfterWait()
+        {
+            if (HasNext) Next();
+            else if (queue.Count > 0) { index = 0; Start(queue[0], queue[0].Load()); }
+        }
 
         /// <summary>Like a CD player: back to the start of this song, or (near its start) to the previous song.</summary>
         public void Previous()
@@ -111,6 +121,7 @@ namespace NrgToMp3Win
             output.PlaybackStopped += (_, _) =>
             {
                 if (PlayingId != id) return;          // stopped by us, not by reaching the end
+                if (StopAfterEach && queue.Count > 0 && (HasNext || RepeatAll)) { Halt(); WaitingAfterSong = true; Changed?.Invoke(); return; }
                 if (HasNext) Next();
                 else if (RepeatAll && queue.Count > 0) { index = 0; Start(queue[0], queue[0].Load()); }
                 else Stop();
@@ -129,6 +140,7 @@ namespace NrgToMp3Win
             output = null;
             PlayingId = null;
             Paused = false;
+            WaitingAfterSong = false;
             if (o != null) { try { o.Stop(); } catch { } o.Dispose(); }
             stream?.Dispose();
             stream = null;
@@ -136,7 +148,7 @@ namespace NrgToMp3Win
 
         public void Stop()
         {
-            bool was = PlayingId != null;
+            bool was = PlayingId != null || WaitingAfterSong;
             Halt();
             queue = new(); index = 0; nextSong = null;
             if (was) Changed?.Invoke();

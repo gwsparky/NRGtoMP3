@@ -20,6 +20,7 @@ namespace NrgToMp3Win
         readonly TrackBar seek = new() { Dock = DockStyle.Fill, Maximum = 1000, TickStyle = TickStyle.None };
         readonly Label time = new() { AutoSize = true, Font = new Font("Segoe UI", 10f), Margin = new Padding(3, 8, 3, 3) };
         readonly Button play = new() { Text = "▶  Play", Width = 110, Height = 40, Font = new Font("Segoe UI", 11f, FontStyle.Bold) };
+        readonly CheckBox playAllBox = new() { Text = "Play songs one after another", AutoSize = true, Checked = true };
         readonly CheckBox repeat = new() { Text = "Repeat", Appearance = Appearance.Button, AutoSize = true };
         readonly TrackBar volume = new() { Width = 140, Minimum = 0, Maximum = 100, TickStyle = TickStyle.None };
         readonly TextBox name = new() { Width = 260, PlaceholderText = "Playlist name (optional)" };
@@ -51,6 +52,8 @@ namespace NrgToMp3Win
             next.Click += (_, _) => player.Next();
             last10.Click += (_, _) => player.LastTen();
             repeat.CheckedChanged += (_, _) => player.RepeatAll = repeat.Checked;
+            playAllBox.Checked = Settings.Get("playerPlayAll", "1") != "0";
+            playAllBox.CheckedChanged += (_, _) => { player.StopAfterEach = !playAllBox.Checked; Settings.Set("playerPlayAll", playAllBox.Checked ? "1" : "0"); };
             volume.Value = (int)Math.Round(float.TryParse(Settings.Get("volume", "1"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v * 100 : 100);
             player.Volume = volume.Value / 100f;
             volume.ValueChanged += (_, _) => { player.Volume = volume.Value / 100f; Settings.Set("volume", (volume.Value / 100f).ToString(System.Globalization.CultureInfo.InvariantCulture)); };
@@ -60,6 +63,7 @@ namespace NrgToMp3Win
             tips.SetToolTip(next, "Next song");
             tips.SetToolTip(last10, "Jump to the last 10 seconds of the song");
             tips.SetToolTip(repeat, "Start the playlist again after the last song");
+            tips.SetToolTip(playAllBox, "Ticked: each song goes straight on to the next. Unticked: stop at the end of each song; press Play for the next one.");
 
             var titles = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown };
             titles.Controls.AddRange(new Control[] { nowTitle, nowInfo });
@@ -68,9 +72,10 @@ namespace NrgToMp3Win
             var timeBox = new Panel { Dock = DockStyle.Right, Width = 120 }; timeBox.Controls.Add(time);
             seekRow.Controls.Add(timeBox);
             var buttons = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink };
-            buttons.Controls.AddRange(new Control[] { prev, play, stop, next, last10, repeat,
+            buttons.Controls.AddRange(new Control[] { prev, play, stop, next, last10, repeat, playAllBox,
                 new Label { Text = "   🔈", AutoSize = true, Margin = new Padding(3, 12, 0, 3) }, volume, new Label { Text = "🔊", AutoSize = true, Margin = new Padding(0, 12, 3, 3) } });
             repeat.Margin = new Padding(3, 10, 3, 3);
+            playAllBox.Margin = new Padding(12, 12, 3, 3);
             volume.Margin = new Padding(0, 10, 0, 3);
             var nowPanel = new Panel { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding(10), BorderStyle = BorderStyle.FixedSingle };
             nowPanel.Controls.Add(buttons); nowPanel.Controls.Add(seekRow); nowPanel.Controls.Add(titles);
@@ -142,22 +147,23 @@ namespace NrgToMp3Win
         void PlayFrom(int i)
         {
             if (i < 0 || i >= songs.Count) return;
-            try { player.PlayAll(Items(), i); }
+            try { player.PlayAll(Items(), i, !playAllBox.Checked); }
             catch (Exception ex) { status.Text = "Couldn't play: " + ex.Message; }
         }
 
         void PlayPause()
         {
             if (player.PlayingId != null) { player.TogglePause(); return; }
+            if (player.WaitingAfterSong) { player.PlayNextAfterWait(); return; }
             PlayFrom(grid.CurrentRow?.Index ?? 0);
         }
 
         void UpdateNowPlaying()
         {
             bool on = player.PlayingId != null;
-            nowTitle.Text = on ? player.Title : "Nothing playing";
+            nowTitle.Text = on ? player.Title : player.WaitingAfterSong ? "Stopped at the end of the song" : "Nothing playing";
             nowInfo.Text = on ? (player.QueueCount > 0 ? $"Song {player.QueueIndex + 1} of {player.QueueCount}" : "") + (player.Paused ? " · paused" : "")
-                              : "Choose a song below, or press Play to start the playlist";
+                              : player.WaitingAfterSong ? "Press Play for the next song" : "Choose a song below, or press Play to start the playlist";
             play.Text = on && !player.Paused ? "⏸  Pause" : "▶  Play";
             if (!on) { seek.Value = 0; time.Text = ""; }
             building = true;

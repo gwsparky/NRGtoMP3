@@ -279,6 +279,8 @@ final class Previewer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published var queueIndex = 0
     @Published var paused = false
     @Published var repeatAll = false                // Player tab: start the list again after the last song
+    @Published var stopAfterEach = false            // Player tab: stop at the end of each song instead of going on
+    @Published var waitingAfterSong = false         // stopped after a song (stopAfterEach); Play goes on to the next
     @Published var volume: Float = (UserDefaults.standard.object(forKey: "volume") as? Float) ?? 1 {
         didSet { player?.volume = volume; UserDefaults.standard.set(volume, forKey: "volume") }
     }
@@ -300,8 +302,9 @@ final class Previewer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 
     /// Plays `items` in order from `index`, moving straight on to the next song as each one ends.
-    func playAll(_ items: [Item], from index: Int = 0) {
+    func playAll(_ items: [Item], from index: Int = 0, stopAfterEach: Bool = false) {
         stop()
+        self.stopAfterEach = stopAfterEach
         guard items.indices.contains(index) else { return }
         queue = items
         queueIndex = index
@@ -311,6 +314,11 @@ final class Previewer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     var hasPrevious: Bool { !queue.isEmpty && queueIndex > 0 }
     var hasNext: Bool { !queue.isEmpty && queueIndex < queue.count - 1 }
     func next() { if hasNext { queueIndex += 1; start(queue[queueIndex]) } }
+    /// After stopping at the end of a song: play the next one (or the first again with Repeat).
+    func playNextAfterWait() {
+        if hasNext { next() }
+        else if !queue.isEmpty { queueIndex = 0; start(queue[0]) }
+    }
     func previous() {
         if position > 3 || !hasPrevious { seek(0) }          // like a CD player: first press goes back to the start of the song
         else { queueIndex -= 1; start(queue[queueIndex]) }
@@ -357,12 +365,13 @@ final class Previewer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private func halt() {
         player?.stop(); player = nil
         timer?.invalidate(); timer = nil
-        playingID = nil; position = 0; duration = 0; loading = false; paused = false
+        playingID = nil; position = 0; duration = 0; loading = false; paused = false; waitingAfterSong = false
     }
 
     func stop() { halt(); queue = []; queueIndex = 0 }
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if stopAfterEach && !queue.isEmpty && (hasNext || repeatAll) { halt(); waitingAfterSong = true; return }
         if hasNext { next() }
         else if repeatAll && !queue.isEmpty { queueIndex = 0; start(queue[0]) }
         else { stop() }

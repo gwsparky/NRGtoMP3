@@ -11,6 +11,7 @@ struct PlayerTab: View {
     @ObservedObject var player: Previewer
     let showBurnList: () -> Void
     @State private var targeted = false
+    @AppStorage("playerPlayAll") private var playAllOn = true   // Player tab: go straight on to the next song
     @State private var selection = Set<UUID>()
 
     var playingIndex: Int? { list.items.firstIndex { $0.id.uuidString == player.playingID } }
@@ -86,9 +87,9 @@ struct PlayerTab: View {
         VStack(spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(player.playingID == nil ? "Nothing playing" : player.title)
+                    Text(player.waitingAfterSong ? "Stopped at the end of the song" : player.playingID == nil ? "Nothing playing" : player.title)
                         .font(.title2).bold().lineLimit(1)
-                    Text(player.playingID == nil ? "Choose a song below, or press Play to start the playlist"
+                    Text(player.waitingAfterSong ? "Press Play for the next song" : player.playingID == nil ? "Choose a song below, or press Play to start the playlist"
                          : (player.queue.isEmpty ? player.subtitle : "Song \(player.queueIndex + 1) of \(player.queue.count)"))
                         .foregroundStyle(.secondary).lineLimit(1)
                 }
@@ -112,13 +113,17 @@ struct PlayerTab: View {
                 .disabled(list.items.isEmpty && player.playingID == nil)
                 .help("Play / pause")
                 Button { player.stop() } label: { Image(systemName: "stop.fill").font(.title2) }
-                    .disabled(player.playingID == nil).help("Stop")
+                    .disabled(player.playingID == nil && !player.waitingAfterSong).help("Stop")
                 Button { player.next() } label: { Image(systemName: "forward.end.fill").font(.title2) }
                     .disabled(!player.hasNext).help("Next song")
                 Button("Last 10 s") { player.lastTen() }.disabled(player.playingID == nil)
                     .help("Jump to the last 10 seconds of the song")
                 Toggle(isOn: $player.repeatAll) { Label("Repeat", systemImage: "repeat") }
                     .toggleStyle(.button).help("Start the playlist again after the last song")
+                Toggle("Play songs one after another", isOn: $playAllOn)
+                    .toggleStyle(.checkbox)
+                    .help("Ticked: each song goes straight on to the next. Unticked: stop at the end of each song; press Play for the next one.")
+                    .onChange(of: playAllOn) { player.stopAfterEach = !$0 }
                 Spacer()
                 Image(systemName: "speaker.fill").foregroundStyle(.secondary)
                 Slider(value: $player.volume, in: 0...1).frame(width: 120)
@@ -131,8 +136,9 @@ struct PlayerTab: View {
 
     func playPause() {
         if player.playingID != nil { player.togglePause(); return }
+        if player.waitingAfterSong { player.playNextAfterWait(); return }
         let from = selection.compactMap { id in list.items.firstIndex { $0.id == id } }.min() ?? 0
-        player.playAll(list.playItems, from: from)
+        player.playAll(list.playItems, from: from, stopAfterEach: !playAllOn)
     }
 
     // MARK: rows
@@ -142,7 +148,7 @@ struct PlayerTab: View {
         return HStack(spacing: 10) {
             Text("\(i + 1)").monospacedDigit().foregroundStyle(.secondary).frame(width: 26, alignment: .trailing)
             Button {
-                if isPlaying { player.togglePause() } else { player.playAll(list.playItems, from: i) }
+                if isPlaying { player.togglePause() } else { player.playAll(list.playItems, from: i, stopAfterEach: !playAllOn) }
             } label: {
                 Image(systemName: isPlaying ? (player.paused ? "play.circle.fill" : "speaker.wave.2.circle.fill") : "play.circle")
                     .font(.title2).foregroundStyle(Color.accentColor)
@@ -187,7 +193,7 @@ struct PlayerTab: View {
         guard let cd = cds.first else { list.status = "No audio CD found. Put one in the drive, wait for it to appear, then try again."; return }
         let start = list.items.count
         list.addCD(cd)
-        if list.items.count > start { player.playAll(list.playItems, from: start) }
+        if list.items.count > start { player.playAll(list.playItems, from: start, stopAfterEach: !playAllOn) }
     }
 
     func chooseFiles() {
