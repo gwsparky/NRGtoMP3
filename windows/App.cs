@@ -157,7 +157,11 @@ namespace NrgToMp3Win
             }
             update.Click += (_, _) => { if (newPage != null) Updates.OpenPage(newPage); else Check(false); };
             new ToolTip().SetToolTip(update, "See if a newer ChurchSound is on GitHub");
+            var credits = new Button { Text = "Credits", AutoSize = true };
+            credits.Click += (_, _) => Credits.Show(this);
+            new ToolTip().SetToolTip(credits, "The parts of ChurchSound made by other people, and their licences");
             bar.Controls.Add(version);
+            bar.Controls.Add(credits);
             bar.Controls.Add(update);
             if (!DateTime.TryParse(Settings.Get("lastUpdateCheck"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var last) || DateTime.UtcNow - last > TimeSpan.FromHours(20))
                 Shown += (_, _) => Check(true);

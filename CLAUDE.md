@@ -20,7 +20,7 @@ be created from a cloud session.
 | `mac/*.swift`, `mac/*.c` | SwiftUI Mac app (tabs: Convert, Player, Burn CD, Copy CD, Split Song, Change Key, Waveform Viewer, Song Words; Player and Change Key also play audio CDs with their CD-Text names via `AudioCD.swift`) | Mac |
 | `build-app.sh` | Mac build: app + `dist/ChurchSound Installer.dmg` | Mac |
 | `windows/*.cs`, `windows/NrgToMp3Win.csproj` | WinForms Windows app (`net8.0-windows`, includes the shared files above) | Windows |
-| `windows/build-windows.sh` | builds both Windows `.exe`s **from the Mac** (zsh); on Windows use the commands below | Mac |
+| `windows/build-windows.sh` | builds both Windows folders + `.zip`s **from the Mac** (zsh); on Windows use the commands below | Mac |
 | `MP3toWAV/`, `NameWriteOn/`, `mp3-to-wav.html` | George's separate projects. **Not part of this app; leave them alone.** | — |
 | `bin/`, `obj/`, `dist/`, `windows/bin/`, `windows/obj/` | build output (safe to delete; rebuilt as needed) | — |
 
@@ -55,7 +55,7 @@ Needs the **.NET 8 SDK** (`winget install Microsoft.DotNet.SDK.8`). From the pro
 ```powershell
 dotnet build windows\NrgToMp3Win.csproj -c Debug -r win-x64     # quick build to test
 dotnet run --project windows\NrgToMp3Win.csproj -r win-x64       # build and start it
-# the single-file exe George copies around (self-contained, nothing to install):
+# the folder George copies around (self-contained .exe + LGPL DLLs + Licenses; nothing to install):
 dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-x64 -o dist\windows\x64
 dotnet publish windows\NrgToMp3Win.csproj -c Release -r win-arm64 -o dist\windows\arm64
 ```
@@ -115,6 +115,10 @@ The app is called **ChurchSound** (renamed in build 30). Only what George sees c
 
 ## Working with George
 
-- Every build he tests: run `./bump-version.sh` (both apps use `BUILD`), rebuild **both** `win-x64` and `win-arm64` if he's using the VM too, and tell him exactly where the `.exe` is and what to try.
+- Every build he tests: run `./bump-version.sh` (both apps use `BUILD`), rebuild **both** `win-x64` and `win-arm64` if he's using the VM too, and tell him exactly where the Windows folder/.zip is and what to try.
 - Test what you can headlessly first. `Disc.cs`, `SongCore.cs`, `PlaylistCore.cs` and the shared converter run without a UI, so a small console project that includes them makes a good test harness.
 - He reports problems with screenshots; ask for the exact error text.
+
+## Licences (checked 26.11.22, so the apps can be sold)
+- `licenses/` holds `Credits.txt` (every outside part, its licence and source link) and the licence texts. Both apps show it with a **Credits** button (Mac: `CreditsButton` in `mac/Updates.swift`, from `Contents/Resources/Licenses`; Windows: `windows/Credits.cs`, from the `Licenses` folder beside the .exe). Add any new outside part to `Credits.txt`.
+- **LGPL parts must stay separate, replaceable files.** Mac: LAME is `Contents/Frameworks/libmp3lame.0.dylib`, built from source by `mac/build-lame.sh` (macOS 13+, no decoder, so **no mpg123**), with its source tarball and `mp3enc.c` shipped in Licenses. Never link Homebrew's `libmp3lame.a` again (that also only ran on the newest macOS). Windows: SoundTouch.Net DLLs are kept out of the single-file .exe (`KeepLgplFilesOutside` in the .csproj), so the Windows app is now a **folder** (.exe + DLLs + Licenses), shipped as a .zip. Attach the zips, not a bare .exe, to releases.

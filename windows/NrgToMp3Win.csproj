@@ -49,4 +49,17 @@
     <EmbeddedResource Include="$(PkgWhisper_net_Runtime)/build/$(RuntimeIdentifier)/*.dll" LogicalName="whisper/%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!-- Licence rules for selling (LGPL): these parts stay separate, replaceable files next to the .exe instead of
+       being sealed inside it, and the credits/licence texts go in a "Licenses" folder beside it. -->
+  <ItemGroup>
+    <None Include="../licenses/**" LinkBase="Licenses" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+  <Target Name="KeepLgplFilesOutside" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Condition="'%(Filename)' == 'SoundTouch.Net' Or '%(Filename)' == 'SoundTouch.Net.NAudioSupport' Or '%(Filename)' == 'TagLibSharp'">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
 </Project>

@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace NrgToMp3Win
 {
-    /// <summary>The app installs itself: it copies its .exe to the user's Programs folder, adds a Start-menu
+    /// <summary>The app installs itself: it copies its .exe (with the .dll files and Licenses folder beside it) to the user's Programs folder, adds a Start-menu
     /// (and optionally desktop) shortcut, and an entry in Settings → Apps for uninstalling. No admin rights needed.</summary>
     static class Install
     {
@@ -37,6 +37,15 @@ namespace NrgToMp3Win
                         throw new IOException("The installed copy is open. Close it first, then try again.");
                 Directory.CreateDirectory(Folder);
                 File.Copy(Me, InstalledExe, true);
+                // the separate parts and licence texts that must stay next to the .exe
+                var from = Path.GetDirectoryName(Me);
+                foreach (var dll in Directory.GetFiles(from, "*.dll")) File.Copy(dll, Path.Combine(Folder, Path.GetFileName(dll)), true);
+                var lic = Path.Combine(from, "Licenses");
+                if (Directory.Exists(lic))
+                {
+                    Directory.CreateDirectory(Path.Combine(Folder, "Licenses"));
+                    foreach (var f in Directory.GetFiles(lic)) File.Copy(f, Path.Combine(Folder, "Licenses", Path.GetFileName(f)), true);
+                }
                 Shortcut(StartMenuLink);
                 if (answer == DialogResult.Yes) Shortcut(DesktopLink);
                 using (var key = Registry.CurrentUser.CreateSubKey(UninstallKey))

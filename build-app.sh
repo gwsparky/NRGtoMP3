@@ -14,8 +14,15 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 clang -O2 -c mac/cdread.c -o "$WORK/cdread.o"
 swiftc -O -parse-as-library -import-objc-header mac/cdread.h "$WORK/cdread.o" -target arm64-apple-macos13 mac/NrgToMp3App.swift mac/BurnList.swift mac/Lookup.swift mac/CDCopy.swift mac/SplitEditor.swift mac/SplitTab.swift mac/KeyChanger.swift mac/PlayerTab.swift mac/NamesSync.swift mac/AudioCD.swift mac/WaveformTab.swift mac/SongWords.swift mac/Updates.swift -framework DiscRecording -framework DiscRecordingUI -o "$APP/Contents/MacOS/ChurchSound"
 cp dist/cli/NrgToMp3 "$APP/Contents/Resources/"
-# MP3 encoder with LAME built in, so MP3 export works on Macs without Homebrew/ffmpeg
-clang -O2 -I/opt/homebrew/opt/lame/include mac/mp3enc.c /opt/homebrew/opt/lame/lib/libmp3lame.a /opt/homebrew/opt/mpg123/lib/libmpg123.a -o "$APP/Contents/Resources/mp3enc"
+# MP3 encoder: LAME (LGPL) as a separate, replaceable library in Contents/Frameworks (licence rules for selling),
+# built from LAME's source by mac/build-lame.sh; mp3enc is our small program that uses it.
+sh mac/build-lame.sh
+LAME="$HOME/Library/Caches/ChurchApps-lame"
+mkdir -p "$APP/Contents/Frameworks" "$APP/Contents/Resources/Licenses"
+cp "$LAME/lib/libmp3lame.0.dylib" "$APP/Contents/Frameworks/"
+clang -O2 -mmacosx-version-min=13.0 -I"$LAME/include" mac/mp3enc.c "$LAME/lib/libmp3lame.0.dylib" -Wl,-rpath,@executable_path/../Frameworks -o "$APP/Contents/Resources/mp3enc"
+# credits and licence texts (shown by the app's Credits button), with LAME's source and mp3enc's source
+cp licenses/* "$LAME/lame-source.tar.gz" mac/mp3enc.c "$APP/Contents/Resources/Licenses/"
 # App icon: mac/icon.png (made from Logo.png, cropped to the heart and cross), scale to every size macOS wants, pack into .icns
 ICONSET=$(mktemp -d)/AppIcon.iconset; mkdir -p "$ICONSET"
 for s in 16 32 128 256 512; do

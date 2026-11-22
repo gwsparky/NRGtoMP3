@@ -459,6 +459,7 @@ struct RootView: View {
                     .foregroundStyle(.secondary)
                     .padding(.leading, 14)
                 UpdateButton(updates: updates)
+                CreditsButton()
             }
             .font(.caption)
             .padding(.horizontal, 16).padding(.top, 8).frame(minHeight: 30)

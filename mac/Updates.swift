@@ -80,3 +80,32 @@ struct UpdateButton: View {
         }
     }
 }
+
+/// "Credits": the parts made by other people and their licences (Contents/Resources/Licenses, from the licenses folder).
+struct CreditsButton: View {
+    @State private var showing = false
+    static var folder: URL? { Bundle.main.url(forResource: "Licenses", withExtension: nil) }
+    static var text: String {
+        folder.flatMap { try? String(contentsOf: $0.appendingPathComponent("Credits.txt"), encoding: .utf8) }
+            ?? "The credits file is missing from this copy of the app."
+    }
+
+    var body: some View {
+        Button("Credits") { showing = true }
+            .controlSize(.small).help("The parts of this app made by other people, and their licences")
+            .sheet(isPresented: $showing) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Credits and Licences").font(.headline)
+                    ScrollView { Text(Self.text).font(.system(.callout, design: .monospaced)).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }
+                        .frame(width: 720, height: 420)
+                    HStack {
+                        Button("Show Licence Files") { if let f = Self.folder { NSWorkspace.shared.activateFileViewerSelecting([f]) } }
+                            .disabled(Self.folder == nil)
+                        Spacer()
+                        Button("Close") { showing = false }.keyboardShortcut(.defaultAction)
+                    }
+                }
+                .padding(16)
+            }
+    }
+}

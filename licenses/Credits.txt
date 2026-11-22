@@ -1,0 +1,37 @@
+ChurchSound uses these parts made by other people. Thank you to everyone who made them.
+The full licence texts are in this folder ("Licenses").
+
+LAME 4.0: MP3 encoder (Mac version)
+  Licence: GNU LGPL version 2 or later (see "LGPL-2.0 (LAME).txt").
+  Unchanged; built by us as a separate library: ChurchSound.app/Contents/Frameworks/libmp3lame.0.dylib
+  You may replace that file with your own build of LAME. Its source code is included here
+  (lame-source.tar.gz) and at https://lame.sourceforge.io/
+  The small program that uses it (mp3enc) is also included here as source (mp3enc.c).
+
+SoundTouch.Net 2.3.2: changing the key (Windows version)
+  Copyright (c) Olaf Woudenberg 2011-2019. Licence: GNU LGPL version 2.1 or later (see "LGPL-2.1.txt").
+  Unchanged. It is the separate files SoundTouch.Net.dll and SoundTouch.Net.NAudioSupport.dll next to the
+  program, which you may replace with your own build.
+  Source code: https://github.com/owoudenberg/soundtouch.net (tag 2.3.2)
+
+NAudio 2.2.1: playing sound (Windows version)
+  Copyright Mark Heath & contributors. Licence: MIT (see "MIT (NAudio).txt").
+  https://github.com/naudio/NAudio
+
+Microsoft .NET 8 and System.Security.Cryptography.ProtectedData: the Windows version runs on .NET (and so does the Mac version's converter)
+  Copyright .NET Foundation and contributors. Licence: MIT. https://github.com/dotnet/runtime
+
+Whisper.net 1.8.1 and whisper.cpp: writing down song words (Song Words tab)
+  Whisper.net: Copyright (c) 2024 Sandro Hanea. Licence: MIT (see "MIT (Whisper.net).txt"). https://github.com/sandrohanea/whisper.net
+  whisper.cpp: Copyright (c) the ggml authors. Licence: MIT. https://github.com/ggml-org/whisper.cpp
+  The Mac version uses whisper-cpp installed separately with Homebrew.
+  The speech model (ggml-small.en, from OpenAI's Whisper) is downloaded on first use. Licence: MIT.
+
+MusicBrainz: song and album names for Look Up Names come from MusicBrainz (https://musicbrainz.org).
+  Its core data is in the public domain (CC0).
+
+Apple's and Microsoft's own built-in tools (sound playback, CD burning, the Windows MP3 encoder) are part of
+macOS and Windows.
+
+Please use this program only with your church's own recordings and with music you are licensed to copy
+(for example under a CCLI licence). Songs and their words are protected by copyright.
