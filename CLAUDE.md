@@ -1,5 +1,7 @@
 # ChurchSound (formerly NRG to MP3): project notes for Claude
 
+> **Moved (26.11.22):** ChurchSound is now the paid **Advanced** tab of Church Music Player (`~/Desktop/Church Player`, repo `gwsparky/ChurchMusicPlayer`, folder `advanced/`). Make changes there, not here; this repo is kept for reference.
+
 A desktop app (Mac **and** Windows) for George's CD archive: it opens Nero `.nrg` and `.cue/.bin` disc images, previews and plays the songs,
 and converts them to MP3/WAV. It also splits songs, changes their key, copies and burns CDs (Mac only so far), and keeps playlists.
 George is not a programmer: explain in plain language, give him clear test steps, and build things for him rather than telling him to.
