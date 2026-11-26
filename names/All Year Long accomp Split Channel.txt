@@ -1,0 +1,54 @@
+# Song names for All Year Long accomp Split Channel.nrg
+# One song per line: a number, then the name. Lines starting with # are ignored.
+Album: All Year Long accomp Split Channel
+1. Carol Medley 01
+2. Carol Medley 02
+3. Carol Medley 03
+4. Carol Medley 04
+5. Carol Medley 05
+6. Carol Medley 06
+7. Carol Medley 07
+8. Carol Medley 08
+9. Carol Medley 09
+10. Carol Medley  10
+11. Just Another Christmas 11
+12. Just Another Christmas 12
+13. Just Another Christmas 13
+14. Just Another Christmas 14
+15. Just Another Christmas 15
+16. Just Another Christmas 16
+17. The Good, Good News 17
+18. The Good, Good News 18
+19. The Good, Good News 19
+20. The Good, Good News 20
+21. The Good, Good News 21
+22. The Good, Good News 22
+23. The Good, Good News 23
+24. The Good, Good News 24
+25. More Than Enough 25
+26. More Than Enough 26
+27. More Than Enough 27
+28. More Than Enough 28
+29. More Than Enough 29
+30. Shatter The Night 30
+31. Shatter The Night 31
+32. Shatter The Night 32
+33. Shatter The Night 33
+34. Shatter The Night 34
+35. Shatter The Night 35
+36. Shatter The Night 36
+37. Shatter The Night 37
+38. Shatter The Night 38
+39. Somewhere in the Mystery 39
+40. Somewhere in the Mystery 40
+41. Somewhere in the Mystery 41
+42. Somewhere in the Mystery 42
+43. Somewhere in the Mystery 43
+44. Somewhere in the Mystery 44
+45. Somewhere in the Mystery 45
+46. All Year Long 46
+47. All Year Long 47
+48. All Year Long 48
+49. All Year Long 49
+50. All Year Long 50
+51. All Year Long 51
